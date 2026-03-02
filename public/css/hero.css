@@ -1,0 +1,34 @@
+/**
+ * Hero: title, subtitle, image block (large + 2 small), map – Figma layout
+ * All typography and colors use UDS tokens.
+ */
+
+.places-hero-title {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-display1-size);
+  font-weight: var(--uds-text-display1-weight);
+  line-height: var(--uds-text-display1-line-height);
+  color: var(--uds-foreground-primary);
+  margin: 0;
+}
+
+.places-location-subtitle {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body1-size);
+  font-weight: var(--uds-text-body1-weight);
+  line-height: var(--uds-text-body1-line-height);
+  color: var(--uds-foreground-secondary);
+  margin: 0;
+}
+
+.places-hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: var(--uds-space-md);
+}
+
+@media (max-width: 1100px) {
+  .places-hero-grid {
+    grid-template-columns: 1fr;
+  }
+}

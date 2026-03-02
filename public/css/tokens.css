@@ -1,0 +1,155 @@
+/**
+ * UDS (Universal Design System) design tokens – places-supertop
+ *
+ * Color palette aliases map to UDS semantic tokens:
+ *   background: primary, secondary, accent, brand
+ *   foreground: primary, secondary, tertiary, muted, on-color, accent, brand
+ *   line: primary, secondary, tertiary, muted
+ *   shadow: primary, secondary
+ *   always: black, white, transparent, brand, accent
+ *
+ * Typography uses UDS font aliases:
+ *   --uds-font-sans (Yahoo Product Sans)
+ *
+ * Spacing tokens (locked, not configurable):
+ *   2xs, xs, sm, md, lg, xl, 2xl, 3xl, 4xl
+ *
+ * Shapes:
+ *   border-radius: none, xs, sm, md, lg, xl, full
+ *   border-width: none, thin, medium, thick
+ */
+:root {
+  /* ── Font aliases ── */
+  --uds-font-sans: 'Yahoo Product Sans', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+
+  /* ── Background palette ── */
+  --uds-background-primary: #ffffff;
+  --uds-background-secondary: #fcfbfb;
+  --uds-background-accent: #7b61ff;
+  --uds-background-brand: #6001d2;
+
+  /* ── Foreground palette ── */
+  --uds-foreground-primary: #141414;
+  --uds-foreground-secondary: #444444;
+  --uds-foreground-tertiary: #8e8e8e;
+  --uds-foreground-muted: #b0b0b0;
+  --uds-foreground-on-color: #ffffff;
+  --uds-foreground-accent: #7b61ff;
+  --uds-foreground-brand: #6001d2;
+
+  /* ── Line palette ── */
+  --uds-line-primary: #cdcdcd;
+  --uds-line-secondary: #e3e3e3;
+
+  /* ── Spectrum ── */
+  --uds-spectrum-purple-1: #ebe5ff;
+  --uds-spectrum-carbon-2: #f5f5f5;
+
+  /* ── Algo link color ── */
+  --uds-foreground-link: #2015C2;
+  --uds-line-tertiary: #f0f0f0;
+  --uds-line-muted: #f5f5f5;
+
+  /* ── Shadow palette ── */
+  --uds-shadow-primary: rgba(0, 0, 0, 0.1);
+  --uds-shadow-secondary: rgba(0, 0, 0, 0.06);
+
+  /* ── Always palette (theme-invariant) ── */
+  --uds-always-black: #000000;
+  --uds-always-white: #ffffff;
+  --uds-always-transparent: transparent;
+  --uds-always-brand: #6001d2;
+  --uds-always-accent: #7b61ff;
+
+  /* ── Typography scale (UDS text variants) ── */
+  /* display1 */
+  --uds-text-display1-size: 36px;
+  --uds-text-display1-line-height: 40px;
+  --uds-text-display1-weight: 700;
+
+  /* title1 */
+  --uds-text-title1-size: 28px;
+  --uds-text-title1-line-height: 32px;
+  --uds-text-title1-weight: 500;
+
+  /* title2 */
+  --uds-text-title2-size: 24px;
+  --uds-text-title2-line-height: 29px;
+  --uds-text-title2-weight: 500;
+
+  /* title3 */
+  --uds-text-title3-size: 20px;
+  --uds-text-title3-line-height: 24px;
+  --uds-text-title3-weight: 500;
+
+  /* headline1 */
+  --uds-text-headline1-size: 18px;
+  --uds-text-headline1-line-height: 22px;
+  --uds-text-headline1-weight: 500;
+
+  /* body1 */
+  --uds-text-body1-size: 16px;
+  --uds-text-body1-line-height: 24px;
+  --uds-text-body1-weight: 400;
+
+  /* body2 */
+  --uds-text-body2-size: 14px;
+  --uds-text-body2-line-height: 20px;
+  --uds-text-body2-weight: 400;
+
+  /* label3 */
+  --uds-text-label3-size: 14px;
+  --uds-text-label3-line-height: 16px;
+  --uds-text-label3-weight: 400;
+
+  /* label4 */
+  --uds-text-label4-size: 14px;
+  --uds-text-label4-line-height: 16px;
+  --uds-text-label4-weight: 400;
+
+  /* caption1 */
+  --uds-text-caption1-size: 12px;
+  --uds-text-caption1-line-height: 16px;
+  --uds-text-caption1-weight: 400;
+
+  /* ui2 */
+  --uds-text-ui2-size: 14px;
+  --uds-text-ui2-line-height: 16px;
+  --uds-text-ui2-weight: 500;
+
+  /* ui3 */
+  --uds-text-ui3-size: 14px;
+  --uds-text-ui3-line-height: 20px;
+  --uds-text-ui3-weight: 500;
+
+  /* ── Spacing (locked) ── */
+  --uds-space-2xs: 4px;
+  --uds-space-xs: 8px;
+  --uds-space-sm: 12px;
+  --uds-space-md: 16px;
+  --uds-space-lg: 24px;
+  --uds-space-xl: 32px;
+  --uds-space-2xl: 40px;
+  --uds-space-3xl: 48px;
+  --uds-space-4xl: 64px;
+
+  /* ── Shapes ── */
+  --uds-radius-none: 0px;
+  --uds-radius-xs: 2px;
+  --uds-radius-sm: 4px;
+  --uds-radius-md: 8px;
+  --uds-radius-lg: 12px;
+  --uds-radius-xl: 16px;
+  --uds-radius-full: 9999px;
+
+  --uds-border-none: 0px;
+  --uds-border-thin: 1px;
+  --uds-border-medium: 2px;
+  --uds-border-thick: 4px;
+
+  /* ── Elevation ── */
+  --uds-elevation-0-shadow: none;
+  --uds-elevation-1-shadow: 0 1px 3px var(--uds-shadow-primary), 0 1px 2px var(--uds-shadow-secondary);
+  --uds-elevation-2-shadow: 0 4px 6px -1px var(--uds-shadow-primary), 0 2px 4px -2px var(--uds-shadow-primary);
+  --uds-elevation-3-shadow: 0 10px 15px -3px var(--uds-shadow-primary), 0 4px 6px -4px var(--uds-shadow-primary);
+}

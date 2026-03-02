@@ -1,0 +1,14 @@
+{
+  "base": { "style": "oslo", "scheme": "normal.day" },
+  "definitions": {
+    "CityCenter.Class1.Label.Size": ["interpolate", ["linear"], ["zoom"], 3, 16, 9, 25, 14, 33, 20, 33, 24, 33],
+    "CityCenter.Class2.Label.Size": ["interpolate", ["linear"], ["zoom"], 3, 15, 9, 20, 15, 31, 20, 31, 24, 31],
+    "CityCenter.Class3.Label.Size": ["interpolate", ["linear"], ["zoom"], 3, 15, 9, 18, 15, 27, 20, 27, 24, 27],
+    "CityCenter.Class4.Label.Size": ["interpolate", ["linear"], ["zoom"], 3, 14, 9, 16, 15, 26, 20, 26, 24, 26],
+    "CityCenter.Class5.Label.Size": ["interpolate", ["linear"], ["zoom"], 4, 14, 9, 15, 15, 24, 20, 24, 24, 24],
+    "CityCenter.Class6.Label.Size": ["interpolate", ["linear"], ["zoom"], 5, 13, 9, 14, 15, 21, 20, 21, 24, 21],
+    "CityCenter.Class7.Label.Size": ["interpolate", ["linear"], ["zoom"], 6, 12, 9, 13, 15, 19, 20, 19, 24, 19],
+    "CityCenter.Hamlet.Label.Size": ["interpolate", ["linear"], ["zoom"], 7, 12, 9, 12, 16, 17, 20, 17, 24, 17],
+    "Neighborhood.Label.Size": ["interpolate", ["linear"], ["zoom"], 7, 11, 9, 11, 16, 16, 20, 16, 24, 16]
+  }
+}

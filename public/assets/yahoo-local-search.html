@@ -1,0 +1,3689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yahoo Local Search - Starbucks</title>
+  
+  <!-- HERE Maps API with Harp Engine -->
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-harp.js"></script>
+  <link rel="stylesheet" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css">
+  <style>
+    @font-face {
+      font-family: 'Yahoo Product Sans';
+      src: url('YahooProductSans-VF_CONFIDENTIAL.ttf') format('truetype');
+      font-weight: 100 900;
+      font-style: normal;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --white: #ffffff;
+      --bg-secondary: #fcfbfb;
+      --bg-hover: #f5f5f5;
+      --text-primary: #141414;
+      --text-secondary: #444444;
+      --text-tertiary: #5a5a5a;
+      --text-positive: #006c3b;
+      --border-primary: #cdcdcd;
+      --border-secondary: #e3e3e3;
+      --purple-light: #ebe5ff;
+      --purple: #6001D2;
+      --indigo: #2015c2;
+      --yelp-red: #ff1a1a;
+      --pin-color: #1a1a2e;
+      --font: 'Yahoo Product Sans', system-ui, -apple-system, sans-serif;
+      --header-height: 131px;
+    }
+
+    html {
+      overflow-x: clip; /* Prevents horizontal scroll without breaking sticky */
+    }
+
+    /* Password Protection Screen */
+    .password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('damnimhandsome.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    @media (max-width: 768px) {
+      .password-overlay {
+        background-position: center top;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .password-overlay {
+        background-size: cover;
+        background-position: center;
+      }
+    }
+
+    .password-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .password-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 48px;
+      width: 100%;
+      max-width: 420px;
+      margin: 16px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .password-container {
+        padding: 32px 24px;
+        border-radius: 20px;
+      }
+    }
+
+    .password-logo {
+      width: 144px;
+      height: 40px;
+      object-fit: contain;
+      margin-bottom: 24px;
+    }
+
+    .password-title {
+      font-family: var(--font);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .password-subtitle {
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .password-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .password-input-wrapper {
+      position: relative;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 16px 48px 16px 20px;
+      font-family: var(--font);
+      font-size: 16px;
+      border: 2px solid var(--border-primary);
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .password-input:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 4px var(--purple-light);
+    }
+
+    .password-input.error {
+      border-color: #e53935;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      padding: 4px;
+    }
+
+    .password-toggle:hover {
+      color: var(--text-primary);
+    }
+
+    .password-submit {
+      padding: 16px 24px;
+      background: var(--purple);
+      color: white;
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .password-submit:hover {
+      background: var(--indigo);
+    }
+
+    .password-submit:active {
+      transform: scale(0.98);
+    }
+
+    .password-error-msg {
+      color: #e53935;
+      font-family: var(--font);
+      font-size: 13px;
+      min-height: 20px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .password-error-msg.visible {
+      opacity: 1;
+    }
+
+    .protected-content {
+      visibility: hidden;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      opacity: 0;
+    }
+
+    .protected-content.unlocked {
+      visibility: visible;
+      pointer-events: auto;
+      position: relative;
+      opacity: 1;
+    }
+    
+    body {
+      font-family: var(--font);
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ========== HEADER ========== */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border-secondary);
+      padding: 20px 34px 12px;
+      position: sticky;
+      top: 0;
+      z-index: 200; /* Above business panel (z-index: 100) so shadow doesn't overlap */
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    /* Yahoo Logo */
+    .yahoo-logo {
+      width: 86px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    /* Search Box */
+    .search-box {
+      display: flex;
+      align-items: center;
+      width: 1146px;
+      height: 54px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: 27px;
+      padding: 0 6px 0 20px;
+    }
+
+    .search-input {
+      flex: 1;
+      height: 100%;
+      border: none;
+      background: transparent;
+      font-family: var(--font);
+      font-size: 16px;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .search-actions {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .search-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+
+    .search-btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .search-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .search-divider {
+      width: 1px;
+      height: 16px;
+      background: #d7d7d7;
+      margin: 0 4px;
+    }
+
+    .scout-btn {
+      width: 40px;
+      height: 40px;
+      background: var(--purple-light);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .scout-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Header Right */
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+
+    .header-icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Tab Bar */
+    .tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding-left: 110px;
+    }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 24px;
+      padding: 0 12px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab:hover {
+      background: var(--bg-hover);
+    }
+
+    .tab.active {
+      background: var(--purple-light);
+      color: var(--text-primary);
+    }
+
+    .tab svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .tab .chevron {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* ========== MAIN ========== */
+    .main {
+      max-width: 1320px;
+      /* Align with left edge of search box: 34px header padding + 86px logo + 24px gap = 144px */
+      padding-left: 144px;
+      padding-right: 34px;
+      transition: max-width 0.3s ease;
+    }
+    
+    body.panel-open .main {
+      max-width: calc(100vw - 446px); /* viewport - 446px panel (no gap) */
+    }
+
+    .local-section {
+      padding-top: 30px;
+      padding-bottom: 32px;
+    }
+
+    /* Results Header - Full Width */
+    .results-header {
+      margin-bottom: 16px;
+    }
+
+    /* Listings + Map Row */
+    .local-grid {
+      display: flex;
+      gap: 20px;
+      position: relative;
+      transition: margin-right 0.3s ease;
+      max-width: 1146px;
+    }
+
+
+    /* ========== LISTINGS COLUMN ========== */
+    .listings-col {
+      width: 350px;
+      flex-shrink: 0;
+      transition: width 0.3s ease;
+    }
+    
+    .local-grid.panel-open .listings-col {
+      width: 245px; /* 30% smaller: 350px * 0.7 */
+    }
+
+    .results-title {
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .results-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .results-location {
+      color: var(--text-primary);
+    }
+
+    .results-link {
+      color: var(--indigo);
+      text-decoration: none;
+    }
+
+    .results-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Filter Chips */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .filter-chip {
+      height: 28px;
+      padding: 0 12px;
+      background: var(--white);
+      border: 1px solid #cdcdcd;
+      border-radius: 9999px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 450;
+      color: #141414;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .filter-chip:hover {
+      background: var(--bg-hover);
+    }
+
+    .filter-chip.active {
+      background: black;
+      border-color: black;
+      color: white;
+    }
+
+    .filter-chip.active:hover {
+      background: #333;
+      border-color: #333;
+    }
+
+    /* Listing Card */
+    .listing {
+      padding: 12px 8px;
+      margin: 0 -8px;
+      border-radius: 16px;
+      transition: background-color 0.15s ease;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .listing:hover {
+      background-color: #f8f4ff;
+    }
+
+
+    .listing-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    /* Map Pin in listing (lettermarker variant) */
+    .listing-pin {
+      width: 22px;
+      height: 29px;
+      flex-shrink: 0;
+    }
+
+    .listing-pin img {
+      width: 22px;
+      height: 29px;
+    }
+
+    .listing-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .listing-name {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .listing-category {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .listing-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .yelp-badge {
+      width: 14px;
+      height: 14px;
+      background: var(--yelp-red);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .yelp-badge svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    .yelp-star-icon {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    .rating-score {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .rating-count {
+      color: var(--text-secondary);
+    }
+
+    .dot {
+      color: var(--text-tertiary);
+    }
+
+    .distance {
+      color: var(--text-tertiary);
+    }
+
+    .listing-hours {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .status-open {
+      color: var(--text-positive);
+    }
+
+    .hours-text {
+      color: var(--text-secondary);
+    }
+
+    /* Listing Buttons */
+    .listing-btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+      overflow: hidden;
+    }
+
+    .listing-btn {
+      flex: 1;
+      min-width: 0;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 12px;
+      background: transparent;
+      border: 1px solid var(--border-primary);
+      border-radius: 9999px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .listing-btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .listing-btn svg,
+    .listing-btn img {
+      width: 16px;
+      height: 16px;
+      color: var(--text-secondary);
+    }
+
+    /* More Listings Button */
+    .more-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      height: 40px;
+      margin-top: 16px;
+      background: #f5f5f5;
+      border: none;
+      border-radius: 9999px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 12px 16px;
+      text-decoration: none;
+    }
+
+    .more-btn:hover {
+      background: #ebebeb;
+    }
+
+    .more-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ========== MAP COLUMN ========== */
+    .map-col {
+      flex: 1;
+      min-width: 300px;
+      transition: flex 0.3s ease, min-width 0.3s ease;
+    }
+
+    .local-grid.panel-open .map-col {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .map-wrapper {
+      position: relative;
+      width: 100%;
+      height: 530px;
+      border-radius: 16px;
+      overflow: visible;
+    }
+    
+    .map-wrapper .map-container {
+      width: 100%;
+      height: 530px;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    /* ========== BUSINESS PANEL ========== */
+    .business-panel {
+      position: fixed;
+      top: var(--header-height);
+      right: -446px;
+      width: 446px;
+      height: calc(100vh - var(--header-height));
+      background: var(--white);
+      overflow: hidden;
+      transition: right 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+      z-index: 100;
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .local-grid.panel-open .business-panel {
+      right: 0;
+      opacity: 1;
+    }
+
+    .business-panel-content {
+      height: 100%;
+      overflow-y: auto;
+      padding: 16px 16px 60px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* Panel Header */
+    .panel-header-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .panel-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .panel-title-content {
+      flex: 1;
+    }
+
+    .panel-business-name {
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .panel-business-subtitle {
+      font-size: 14px;
+      font-weight: 450;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+
+    .close-panel-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .close-panel-btn:hover {
+      background: #e5e5e5;
+    }
+
+    .close-panel-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Image Gallery */
+    .panel-image-gallery {
+      display: flex;
+      gap: 2px;
+      height: 208px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .gallery-main {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .gallery-main img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery-main:hover img {
+      transform: scale(1.1);
+    }
+
+    .gallery-side {
+      width: 166px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .gallery-side-item {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .gallery-side-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery-side-item:hover img {
+      transform: scale(1.1);
+    }
+
+    .gallery-more-btn {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(31, 31, 31, 0.6);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .gallery-more-btn:hover {
+      background: rgba(31, 31, 31, 0.8);
+    }
+
+    /* Image Overlay */
+    .image-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+    }
+
+    .image-overlay.active {
+      display: block;
+    }
+
+    .overlay-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(20, 20, 20, 0.5);
+    }
+
+    .overlay-modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 16px;
+      width: 974px;
+      max-height: 90vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .overlay-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .overlay-chips {
+      display: flex;
+      gap: 8px;
+    }
+
+    .overlay-chip {
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 450;
+      cursor: pointer;
+      border: 1px solid #cdcdcd;
+      background: white;
+      color: #141414;
+    }
+
+    .overlay-chip.active {
+      background: black;
+      color: white;
+      border-color: black;
+    }
+
+    .overlay-close {
+      width: 24px;
+      height: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay-content {
+      display: flex;
+      gap: 20px;
+    }
+
+    .overlay-main {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 616px;
+    }
+
+    .overlay-featured {
+      position: relative;
+      width: 616px;
+      height: 394px;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .overlay-featured img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .overlay-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(31, 31, 31, 0.6);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay-nav.prev {
+      left: 12px;
+    }
+
+    .overlay-nav.next {
+      right: 12px;
+    }
+
+    .overlay-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .overlay-author {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .overlay-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: #5a5a5a;
+    }
+
+    .overlay-yelp-link {
+      color: #444;
+    }
+
+    .overlay-yelp-link a {
+      color: #444;
+      text-decoration: underline;
+    }
+
+    .overlay-thumbnails {
+      width: 310px;
+      max-height: 450px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .overlay-thumb-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .overlay-thumb {
+      width: 144px;
+      height: 144px;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .overlay-thumb.selected {
+      border: 2px solid black;
+      padding: 2px;
+    }
+
+    .overlay-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
+    }
+
+    /* Action Buttons */
+    .panel-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .panel-action-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 16px;
+      background: #0f69ff;
+      border: none;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .panel-action-btn:hover {
+      background: #0d5ad9;
+    }
+
+    .panel-action-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Info Cards Row */
+    .panel-info-cards {
+      display: flex;
+      gap: 12px;
+    }
+
+    .info-card {
+      background: #f5f5f5;
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    .info-card:hover {
+      background: #e3e3e3;
+    }
+
+    .info-card.reviews-card {
+      width: 215px;
+      flex-shrink: 0;
+    }
+
+    .info-card.hours-card {
+      flex: 1;
+    }
+
+    .info-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .info-card-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .info-card-chevron {
+      width: 16px;
+      height: 16px;
+      color: var(--text-secondary);
+    }
+
+    .info-card-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-card-main {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .info-card-main img {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+
+    .info-card-value {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .info-card-value.open {
+      color: #006c3b;
+    }
+
+    .info-card-sub {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    /* Overview Card */
+    .panel-overview {
+      background: #f5f5f5;
+      border-radius: 16px;
+      padding: 16px;
+      transition: background-color 0.2s ease;
+    }
+
+    .panel-overview:hover {
+      background: #e3e3e3;
+    }
+
+    .overview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .overview-chevron {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s ease;
+    }
+
+    .panel-overview.expanded .overview-chevron {
+      transform: rotate(180deg);
+    }
+
+    .overview-full-text {
+      display: none;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+
+    .panel-overview.expanded .overview-text {
+      display: none;
+    }
+
+    .panel-overview.expanded .overview-full-text {
+      display: block;
+    }
+
+    .overview-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .overview-text {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Action List */
+    .panel-action-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .action-list-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 0;
+      border-top: 1px solid #e0e4e9;
+      border-bottom: 1px solid #e0e4e9;
+      margin-top: -1px;
+    }
+
+    .action-list-item:first-child {
+      margin-top: 0;
+    }
+
+    .action-list-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .action-list-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .action-list-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .action-list-label.open {
+      color: #30a159;
+    }
+
+    .action-list-item:hover .action-list-label {
+      text-decoration: underline;
+    }
+
+    .action-list-link {
+      width: 16px;
+      height: 16px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    /* Expandable Hours */
+    .hours-chevron {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s ease;
+      margin-left: auto;
+    }
+
+    .hours-expandable.expanded .hours-chevron {
+      transform: rotate(180deg);
+    }
+
+    .hours-expandable.expanded {
+      border-bottom: none;
+    }
+
+    .hours-expanded-content {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0 0 16px 24px;
+      border-bottom: 1px solid #e0e4e9;
+    }
+
+    .hours-expandable.expanded + .hours-expanded-content {
+      display: flex;
+    }
+
+    .hours-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .hours-day {
+      color: var(--text-secondary);
+    }
+
+    .hours-time {
+      color: var(--text-primary);
+    }
+
+    /* Verify Business */
+    .verify-business {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-top: 14px;
+    }
+
+    .verify-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--text-secondary);
+    }
+
+    .verify-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .verify-text a {
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    /* Amenities */
+    .panel-amenities {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .amenities-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .amenities-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .amenities-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .amenity-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .amenity-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--text-secondary);
+    }
+
+    .amenity-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* Reviews Summary */
+    .panel-reviews-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .reviews-summary-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .reviews-count-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .reviews-breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .review-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .review-bar-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      width: 40px;
+    }
+
+    .review-bar-track {
+      flex: 1;
+      height: 10px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .review-bar-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      border-radius: 8px;
+    }
+
+    .review-bar-fill.star-5 { background: #d32323; }
+    .review-bar-fill.star-4 { background: #ff523d; }
+    .review-bar-fill.star-3 { background: #ff7e42; }
+    .review-bar-fill.star-2 { background: #ffa448; }
+    .review-bar-fill.star-1 { background: #ffcb4b; }
+
+    .review-bar-count {
+      font-size: 14px;
+      color: var(--text-secondary);
+      width: 30px;
+      text-align: right;
+    }
+
+    /* Individual Reviews */
+    .review-item {
+      padding: 8px 0;
+    }
+
+    .review-header {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .review-stars {
+      display: flex;
+      gap: 2px;
+    }
+
+    .review-star {
+      width: 14px;
+      height: 14px;
+    }
+    
+    .review-star.empty {
+      opacity: 0.3;
+    }
+
+    .review-author {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .review-date {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .review-text {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      display: -webkit-box;
+      -webkit-line-clamp: 6;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* More Reviews Button */
+    .more-reviews-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 16px;
+      background: #f5f5f5;
+      border: none;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      text-decoration: none;
+      align-self: flex-start;
+    }
+
+    .more-reviews-btn:hover {
+      background: #ebebeb;
+    }
+
+    .more-reviews-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Profiles Section */
+    .panel-profiles {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .profiles-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .profiles-list {
+      display: flex;
+      gap: 8px;
+      padding-top: 8px;
+    }
+
+    .profile-tile {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 0;
+      min-width: 80px;
+    }
+
+    .profile-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .profile-label {
+      font-size: 14px;
+      font-weight: 450;
+      color: var(--text-primary);
+      text-align: center;
+    }
+
+    .hours-row .time {
+      color: var(--text-primary);
+    }
+
+    .hours-row.today {
+      font-weight: 600;
+    }
+
+    .hours-row.today .day,
+    .hours-row.today .time {
+      color: var(--text-primary);
+    }
+      overflow: hidden;
+    }
+
+    /* Map Pins (lettermarker variant) */
+    .map-pin {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform: translate(-50%, -100%);
+      cursor: pointer;
+    }
+
+    .map-pin .pin-default {
+      width: 22px;
+      height: 29px;
+      display: block;
+    }
+
+    .map-pin .pin-active {
+      width: 24px;
+      height: 32px;
+      display: none;
+    }
+
+    .map-pin:hover .pin-default {
+      display: none;
+    }
+
+    .map-pin:hover .pin-active {
+      display: block;
+    }
+
+    .map-pin:hover {
+      z-index: 10;
+    }
+
+    /* Hover Card - positioned within map-wrapper */
+    .hover-card {
+      position: absolute;
+      width: 280px;
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, visibility 0.15s ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .hover-card.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .hover-card-gallery {
+      display: flex;
+      height: 80px;
+      gap: 2px;
+    }
+
+    .hover-card-gallery img {
+      flex: 1;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hover-card-image {
+      display: none;
+    }
+
+    .hover-card-content {
+      padding: 12px;
+    }
+
+    .hover-card-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .hover-card-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .hover-card-rating .yelp-badge {
+      width: 14px;
+      height: 14px;
+    }
+
+    .hover-card-hours {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .hover-card-hours .status-open {
+      color: var(--text-positive);
+      font-weight: 500;
+    }
+
+    .hover-card-hours .hours-text {
+      color: var(--text-secondary);
+    }
+
+    .hover-card-hours .dot {
+      color: var(--text-tertiary);
+    }
+
+    .hover-card .yelp-badge {
+      width: 14px;
+      height: 14px;
+      background: var(--yelp-red);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .hover-card .yelp-badge svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    .hover-card .rating-score {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .hover-card .rating-count {
+      color: var(--text-secondary);
+    }
+
+
+    /* Map Controls */
+    .map-controls {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .map-ctrl {
+      width: 32px;
+      height: 32px;
+      background: var(--white);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      color: var(--text-secondary);
+      transition: background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .map-ctrl:hover {
+      background: var(--bg-hover);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+
+    .map-ctrl svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ========== DIVIDER ========== */
+    .divider {
+      height: 1px;
+      background: var(--border-secondary);
+      margin-left: 144px;
+      margin-right: 34px;
+    }
+
+    /* ========== ORGANIC SEARCH RESULTS ========== */
+    .algo-section {
+      padding: 32px 34px 80px 144px;
+      max-width: 820px;
+    }
+
+    .algo-result {
+      margin-bottom: 28px;
+    }
+
+    .algo-result-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .algo-favicon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .algo-favicon img {
+      width: 16px;
+      height: 16px;
+    }
+
+    .algo-site-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .algo-site-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .algo-url {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+
+    .algo-title {
+      font-family: 'Yahoo Product Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: #1a0dab;
+      margin-bottom: 4px;
+      line-height: 1.3;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+    }
+
+    .algo-title:hover {
+      text-decoration: underline;
+    }
+
+    .algo-snippet {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .algo-snippet strong {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .algo-date {
+      color: var(--text-tertiary);
+    }
+
+    /* ========== RESPONSIVE STYLES ========== */
+    
+    /* Large tablets and small desktops */
+    @media (max-width: 1400px) {
+      .main {
+        max-width: 100%;
+        padding-left: 40px;
+        padding-right: 40px;
+      }
+      
+      .header {
+        padding: 16px 40px;
+      }
+      
+      .algo-section {
+        padding-left: 40px;
+        padding-right: 40px;
+      }
+    }
+    
+    /* Tablets */
+    @media (max-width: 1024px) {
+      .main {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+      
+      .header {
+        padding: 16px 24px;
+      }
+      
+      .listings-col {
+        width: 280px;
+      }
+      
+      .local-grid.panel-open .listings-col {
+        width: 200px;
+      }
+      
+      .algo-section {
+        padding-left: 24px;
+        padding-right: 24px;
+        max-width: 100%;
+      }
+      
+      body.panel-open .main {
+        max-width: calc(100vw - 400px);
+      }
+      
+      .business-panel {
+        width: 380px;
+        right: -380px;
+      }
+    }
+    
+    /* Small tablets and large phones */
+    @media (max-width: 768px) {
+      .header {
+        padding: 12px 16px;
+        gap: 12px;
+      }
+      
+      .logo {
+        width: 70px;
+      }
+      
+      .search-box {
+        height: 40px;
+        padding: 0 12px;
+      }
+      
+      .main {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      
+      .local-grid {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .listings-col {
+        width: 100%;
+        order: 2;
+      }
+      
+      .map-col {
+        width: 100%;
+        order: 1;
+        min-width: unset;
+      }
+      
+      .map-wrapper,
+      .map-wrapper .map-container {
+        height: 300px;
+      }
+      
+      .results-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      
+      .chip-filters {
+        width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 8px;
+      }
+      
+      .chip {
+        flex-shrink: 0;
+      }
+      
+      .algo-section {
+        padding: 24px 16px 60px 16px;
+        max-width: 100%;
+      }
+      
+      /* Business panel becomes full width overlay on mobile */
+      .business-panel {
+        width: 100%;
+        right: -100%;
+        top: 0;
+        height: 100vh;
+      }
+      
+      body.panel-open .main {
+        max-width: 100%;
+        display: none;
+      }
+      
+      .local-grid.panel-open .listings-col,
+      .local-grid.panel-open .map-col {
+        width: 100%;
+      }
+    }
+    
+    /* Mobile phones */
+    @media (max-width: 480px) {
+      .header {
+        flex-wrap: wrap;
+      }
+      
+      .search-box {
+        order: 3;
+        width: 100%;
+        margin-top: 8px;
+      }
+      
+      .tabs {
+        display: none;
+      }
+      
+      .listing-btns {
+        flex-direction: column;
+        gap: 6px;
+      }
+      
+      .listing-btn {
+        width: 100%;
+      }
+      
+      .panel-actions {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .panel-action-btn {
+        width: 100%;
+      }
+      
+      .info-cards-row {
+        flex-direction: column;
+      }
+      
+      .panel-image-gallery {
+        height: 200px;
+      }
+      
+      .gallery-side {
+        display: none;
+      }
+      
+      .gallery-main {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Password Protection Overlay -->
+  <div id="passwordOverlay" class="password-overlay">
+    <div class="password-container">
+      <img src="yahoo-logo.svg" alt="Yahoo" class="password-logo">
+      <h1 class="password-title">Protected Prototype</h1>
+      <p class="password-subtitle">Enter password to continue</p>
+      <form id="passwordForm" class="password-form" autocomplete="off">
+        <div class="password-input-wrapper">
+          <input 
+            type="password" 
+            id="passwordInput" 
+            class="password-input" 
+            placeholder="Enter password"
+            autocomplete="new-password"
+            spellcheck="false"
+          >
+          <button type="button" id="togglePassword" class="password-toggle" tabindex="-1">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <p id="errorMsg" class="password-error-msg"></p>
+        <button type="submit" class="password-submit">Access Prototype</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Protected Content Wrapper -->
+  <div id="protectedContent" class="protected-content">
+
+  <!-- ========== HEADER ========== -->
+  <header class="header">
+    <div class="header-top">
+      <div class="header-left">
+        <!-- Yahoo Logo -->
+        <img class="yahoo-logo" src="yahoo-logo.svg" alt="Yahoo">
+
+        <!-- Search Box -->
+        <div class="search-box">
+          <input type="text" class="search-input" value="starbucks near me">
+          <div class="search-actions">
+            <button class="search-btn" title="Clear">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <path d="M12 4L4 12M4 4l8 8"/>
+              </svg>
+            </button>
+            <button class="search-btn" title="Voice">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <rect x="6" y="2" width="4" height="7" rx="2"/>
+                <path d="M4 7v1a4 4 0 008 0V7"/>
+                <path d="M8 12v2"/>
+              </svg>
+            </button>
+            <button class="search-btn" title="Search">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="7" cy="7" r="4.5"/>
+                <path d="M10.5 10.5L14 14" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="search-divider"></div>
+            <button class="scout-btn" title="Yahoo Scout">
+              <svg viewBox="0 0 20 20" fill="#6001D2">
+                <path d="M10 2L12.5 7.5L18 10L12.5 12.5L10 18L7.5 12.5L2 10L7.5 7.5L10 2Z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="header-icon-btn" title="Apps">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <circle cx="4" cy="4" r="1.8"/>
+            <circle cx="10" cy="4" r="1.8"/>
+            <circle cx="16" cy="4" r="1.8"/>
+            <circle cx="4" cy="10" r="1.8"/>
+            <circle cx="10" cy="10" r="1.8"/>
+            <circle cx="16" cy="10" r="1.8"/>
+            <circle cx="4" cy="16" r="1.8"/>
+            <circle cx="10" cy="16" r="1.8"/>
+            <circle cx="16" cy="16" r="1.8"/>
+          </svg>
+        </div>
+        <div class="header-icon-btn" title="Mail">
+          <svg viewBox="0 0 20 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="1" width="18" height="14" rx="2"/>
+            <path d="M1 4l9 5 9-5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <nav class="tabs">
+      <a class="tab" href="#">
+        <svg viewBox="0 0 16 16" fill="#6001D2">
+          <path d="M8 1l2 4.5 5 2.5-5 2.5-2 4.5-2-4.5-5-2.5 5-2.5 2-4.5z"/>
+        </svg>
+        Yahoo Scout
+      </a>
+      <a class="tab active" href="#">All</a>
+      <a class="tab" href="#">Images</a>
+      <a class="tab" href="#">Videos</a>
+      <a class="tab" href="#">News</a>
+      <a class="tab" href="#">Local</a>
+      <a class="tab" href="#">
+        Anytime
+        <svg class="chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 4.5L6 7.5L9 4.5"/>
+        </svg>
+      </a>
+    </nav>
+  </header>
+
+  <!-- ========== MAIN ========== -->
+  <main class="main">
+    <section class="local-section">
+      
+      <!-- Results Header - Full Width -->
+      <div class="results-header">
+        <h1 class="results-title">Starbucks</h1>
+        <div class="results-meta">
+          <span class="results-location">Results for Brooklyn, NY 11215</span>
+          <a class="results-link" href="#">Use precise location</a>
+        </div>
+      </div>
+
+      <!-- Filters - Full Width -->
+      <div class="filters">
+        <button class="filter-chip">Open now</button>
+        <button class="filter-chip">Top rated</button>
+        <button class="filter-chip">Closest</button>
+        <button class="filter-chip">Takeout</button>
+      </div>
+
+      <!-- Listings + Map Grid -->
+      <div class="local-grid">
+        
+        <!-- Listings Column -->
+        <div class="listings-col">
+
+          <!-- Listing A -->
+        <article class="listing" data-pin="A">
+          <div class="listing-row">
+            <div class="listing-pin">
+              <img src="Retail/Letterpin-A.svg" alt="A">
+            </div>
+            <div class="listing-info">
+              <div class="listing-name">Starbucks</div>
+              <div class="listing-category">Coffee house, Coffee & Tea • $$</div>
+              <div class="listing-rating">
+                <img src="yelp-star.svg" alt="" class="yelp-star-icon">
+                <span class="rating-score">5.0</span>
+                <span class="rating-count">(115) Yelp</span>
+                <span class="dot">•</span>
+                <span class="distance">13.51mi</span>
+              </div>
+              <div class="listing-hours">
+                <span class="status-open">Open</span>
+                <span class="dot">•</span>
+                <span class="hours-text">Open until 8:00 PM</span>
+              </div>
+            </div>
+          </div>
+          <div class="listing-btns">
+            <a href="https://www.starbucks.com" target="_blank" class="listing-btn">
+              <img src="Retail/web.svg" alt="">
+              Website
+            </a>
+            <a href="https://www.doordash.com/store/starbucks-wichita-24715396/19816994/?pickup=false" target="_blank" class="listing-btn">
+              <img src="Action list/Property 1=Action List, Row/order.svg" alt="">
+              Order
+            </a>
+          </div>
+        </article>
+
+        <!-- Listing B -->
+        <article class="listing" data-pin="B">
+          <div class="listing-row">
+            <div class="listing-pin">
+              <img src="Retail/letterpin-b.svg" alt="B">
+            </div>
+            <div class="listing-info">
+              <div class="listing-name">Starbucks</div>
+              <div class="listing-category">Coffee house, Coffee & Tea • $$</div>
+              <div class="listing-rating">
+                <img src="yelp-star.svg" alt="" class="yelp-star-icon">
+                <span class="rating-score">5.0</span>
+                <span class="rating-count">(115) Yelp</span>
+                <span class="dot">•</span>
+                <span class="distance">13.51mi</span>
+              </div>
+              <div class="listing-hours">
+                <span class="status-open">Open</span>
+                <span class="dot">•</span>
+                <span class="hours-text">Open until 8:00 PM</span>
+              </div>
+            </div>
+          </div>
+          <div class="listing-btns">
+            <a href="https://www.starbucks.com" target="_blank" class="listing-btn">
+              <img src="Retail/web.svg" alt="">
+              Website
+            </a>
+            <a href="https://www.doordash.com/store/starbucks-wichita-24715396/19816994/?pickup=false" target="_blank" class="listing-btn">
+              <img src="Action list/Property 1=Action List, Row/order.svg" alt="">
+              Order
+            </a>
+          </div>
+        </article>
+
+        <!-- Listing C -->
+        <article class="listing" data-pin="C">
+          <div class="listing-row">
+            <div class="listing-pin">
+              <img src="Retail/letterpin-c.svg" alt="C">
+            </div>
+            <div class="listing-info">
+              <div class="listing-name">Starbucks</div>
+              <div class="listing-category">Coffee house, Coffee & Tea • $$</div>
+              <div class="listing-rating">
+                <img src="yelp-star.svg" alt="" class="yelp-star-icon">
+                <span class="rating-score">5.0</span>
+                <span class="rating-count">(115) Yelp</span>
+                <span class="dot">•</span>
+                <span class="distance">13.51mi</span>
+              </div>
+              <div class="listing-hours">
+                <span class="status-open">Open</span>
+                <span class="dot">•</span>
+                <span class="hours-text">Open until 8:00 PM</span>
+              </div>
+            </div>
+          </div>
+          <div class="listing-btns">
+            <a href="https://www.starbucks.com" target="_blank" class="listing-btn">
+              <img src="Retail/web.svg" alt="">
+              Website
+            </a>
+            <a href="https://www.doordash.com/store/starbucks-wichita-24715396/19816994/?pickup=false" target="_blank" class="listing-btn">
+              <img src="Action list/Property 1=Action List, Row/order.svg" alt="">
+              Order
+            </a>
+          </div>
+        </article>
+
+        <!-- More Button -->
+        <a href="https://search.yahoo.com/local/s;_ylt=AwrEbzpTRIJpOQIARkpXNyoA;_ylu=Y29sbwNiZjEEcG9zAzEEdnRpZAMEc2VjA3BpdnM-?p=starbucks+near+me&fr2=piv-web&fr=crmas" class="more-btn" target="_blank">
+          More listings
+          <img src="rightchev.svg" alt="" style="width: 16px; height: 16px;">
+        </a>
+
+      </div>
+
+      <!-- Map Column -->
+      <div class="map-col">
+        <div class="map-wrapper">
+          <div id="mapContainer" class="map-container"></div>
+          
+          <!-- Hover Card (controlled by JS) -->
+          <div id="hoverCard" class="hover-card">
+            <div class="hover-card-gallery" id="hoverCardGallery">
+              <img id="hoverCardImage1" src="" alt="">
+              <img id="hoverCardImage2" src="" alt="">
+            </div>
+            <img id="hoverCardImage" class="hover-card-image" src="" alt="">
+            <div class="hover-card-content">
+              <div id="hoverCardName" class="hover-card-name"></div>
+              <div class="hover-card-rating">
+                <img src="yelp-star.svg" alt="" class="yelp-star-icon">
+                <span id="hoverCardRating" class="rating-score"></span>
+                <span id="hoverCardReviews" class="rating-count"></span>
+                <span class="dot">•</span>
+                <span id="hoverCardDistance" class="rating-count"></span>
+              </div>
+              <div class="hover-card-hours">
+                <span id="hoverCardStatus" class="status-open">Open</span>
+                <span class="dot">•</span>
+                <span id="hoverCardHours" class="hours-text"></span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Custom Map Controls -->
+          <div class="map-controls">
+            <button class="map-ctrl" id="layersBtn" title="Layers">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+                <path d="M8 2L2 5l6 3 6-3-6-3z"/>
+                <path d="M2 8l6 3 6-3"/>
+                <path d="M2 11l6 3 6-3"/>
+              </svg>
+            </button>
+            <button class="map-ctrl" id="zoomInBtn" title="Zoom in">
+              <img src="Retail/zoom-in.svg" alt="Zoom in" style="width: 16px; height: 16px;">
+            </button>
+            <button class="map-ctrl" id="zoomOutBtn" title="Zoom out">
+              <img src="Retail/zoom-out.svg" alt="Zoom out" style="width: 16px; height: 16px;">
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Detail Panel (slides in from right) -->
+      <div id="businessPanel" class="business-panel">
+        <div class="business-panel-content">
+          <!-- Header Section -->
+          <div class="panel-header-section">
+            <div class="panel-title-row">
+              <div class="panel-title-content">
+                <h2 id="businessName" class="panel-business-name">Starbucks</h2>
+                <div id="businessSubtitle" class="panel-business-subtitle">Coffee house, Coffee & Tea • $$</div>
+              </div>
+              <button id="closePanelBtn" class="close-panel-btn">
+                <img src="x.svg" alt="Close" style="width: 16px; height: 16px;">
+              </button>
+            </div>
+
+            <!-- Image Gallery -->
+            <div class="panel-image-gallery">
+              <div class="gallery-main">
+                <img id="businessHeroImage" src="https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=400&h=400&fit=crop" alt="">
+              </div>
+              <div class="gallery-side">
+                <div class="gallery-side-item">
+                  <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=200&h=150&fit=crop" alt="">
+                </div>
+                <div class="gallery-side-item">
+                  <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=150&fit=crop" alt="">
+                </div>
+              </div>
+              <button class="gallery-more-btn" onclick="openImageOverlay()">
+                <img src="images.svg" alt="" style="width: 16px; height: 16px;">
+              </button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="panel-actions">
+              <a href="https://www.starbucks.com" target="_blank" class="panel-action-btn">
+                <img src="Retail/web.svg" alt="" style="width: 16px; height: 16px; filter: brightness(0) invert(1);">
+                Website
+              </a>
+              <a href="https://www.doordash.com/store/starbucks-wichita-24715396/19816994/?pickup=false" target="_blank" class="panel-action-btn">
+                <img src="Action list/Property 1=Action List, Row/order.svg" alt="" style="width: 16px; height: 16px; filter: brightness(0) invert(1);">
+                Order
+              </a>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="panel-info-cards">
+              <div class="info-card reviews-card" style="cursor: pointer;" onclick="this.closest('.business-panel-content').scrollTo({top: document.getElementById('reviewsSummary').offsetTop - 16, behavior: 'smooth'})">
+                <div class="info-card-header">
+                  <span class="info-card-title">Reviews</span>
+                  <img class="info-card-chevron" src="rightchev.svg" alt="">
+                </div>
+                <div class="info-card-content">
+                  <div class="info-card-main">
+                    <img src="yelp-logo.png" alt="Yelp">
+                    <span id="businessRatingDisplay" class="info-card-value">5.0 on Yelp</span>
+                  </div>
+                  <span id="businessReviewsCount" class="info-card-sub">455 reviews</span>
+                </div>
+              </div>
+              <div class="info-card hours-card" style="cursor: pointer;" onclick="var section = document.getElementById('hoursSection'); var panel = this.closest('.business-panel-content'); section.classList.add('expanded'); setTimeout(function() { var sectionHeight = section.offsetHeight + section.nextElementSibling.offsetHeight; var panelHeight = panel.clientHeight; var scrollPos = section.offsetTop - (panelHeight / 2) + (sectionHeight / 2); panel.scrollTo({top: scrollPos, behavior: 'smooth'}); }, 10);">
+                <div class="info-card-header">
+                  <span class="info-card-title">Hours</span>
+                  <img class="info-card-chevron" src="rightchev.svg" alt="">
+                </div>
+                <div class="info-card-content">
+                  <span class="info-card-value open">Open</span>
+                  <span id="businessHoursDisplay" class="info-card-sub">Closes at 11 PM</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Overview -->
+            <div class="panel-overview" style="cursor: pointer;" onclick="this.classList.toggle('expanded')">
+              <div class="overview-header">
+                <span class="overview-title">Overview</span>
+                <img class="overview-chevron" src="downchev.svg" alt="">
+              </div>
+              <p class="overview-text">Starbucks is a premier roaster and retailer of specialty coffee, offering a wide variety of espresso drinks, teas, pastries, and light fare in a comfortable, welcoming environment...</p>
+              <p class="overview-full-text">Starbucks is a premier roaster and retailer of specialty coffee, offering a wide variety of espresso drinks, teas, pastries, and light fare in a comfortable, welcoming environment. Founded in Seattle in 1971, Starbucks has grown into one of the world's most recognized coffee brands, known for its commitment to ethically sourced coffee beans and community involvement. Each store serves as a neighborhood gathering place where customers can enjoy handcrafted beverages made by skilled baristas, connect with friends, or find a quiet corner to work. The menu features signature favorites like the Pumpkin Spice Latte, Caramel Macchiato, and cold brew options, alongside an ever-evolving selection of seasonal offerings and food items to complement any coffee experience.</p>
+            </div>
+          </div>
+
+          <!-- Action List -->
+          <div class="panel-action-list">
+            <a href="https://www.starbucks.com" target="_blank" class="action-list-item" style="text-decoration: none; color: inherit;">
+              <img class="action-list-icon" src="Retail/web.svg" alt="">
+              <div class="action-list-content">
+                <span class="action-list-label">starbucks.com</span>
+                <img class="action-list-link" src="Action list/Property 1=Action List, Row/link.svg" alt="">
+              </div>
+            </a>
+            <a href="https://www.doordash.com/store/starbucks-wichita-24715396/19816994/?pickup=false" target="_blank" class="action-list-item" style="text-decoration: none; color: inherit;">
+              <img class="action-list-icon" src="Action list/Property 1=Action List, Row/order.svg" alt="">
+              <div class="action-list-content">
+                <span class="action-list-label">Order online</span>
+                <img class="action-list-link" src="Action list/Property 1=Action List, Row/link.svg" alt="">
+              </div>
+            </a>
+            <a href="https://www.starbucks.com/menu" target="_blank" class="action-list-item" style="text-decoration: none; color: inherit;">
+              <img class="action-list-icon" src="Retail/menu.svg" alt="">
+              <div class="action-list-content">
+                <span class="action-list-label">Menu</span>
+                <img class="action-list-link" src="Action list/Property 1=Action List, Row/link.svg" alt="">
+              </div>
+            </a>
+            <a id="businessAddressLink" href="#" target="_blank" class="action-list-item" style="text-decoration: none; color: inherit;">
+              <img class="action-list-icon" src="Action list/Property 1=Action List, Row/location.svg" alt="">
+              <div class="action-list-content">
+                <span id="businessAddress" class="action-list-label">123 Electric Avenue</span>
+              </div>
+            </a>
+            <div class="action-list-item">
+              <img class="action-list-icon" src="Action list/Property 1=Action List, Row/call.svg" alt="">
+              <div class="action-list-content">
+                <span id="businessPhone" class="action-list-label">(817) 726-7608</span>
+              </div>
+            </div>
+            <div id="hoursSection" class="action-list-item hours-expandable" style="cursor: pointer;" onclick="this.classList.toggle('expanded')">
+              <svg class="action-list-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="8" cy="8" r="6"/>
+                <path d="M8 4v4l3 2"/>
+              </svg>
+              <div class="action-list-content">
+                <span class="action-list-label open">Open</span>
+                <span class="action-list-label">•</span>
+                <span id="businessHoursAction" class="action-list-label">Closes at 11 PM</span>
+                <img class="hours-chevron" src="downchev.svg" alt="">
+              </div>
+            </div>
+            <div class="hours-expanded-content">
+              <div class="hours-row"><span class="hours-day">Monday</span><span class="hours-time">6:00 AM - 9:00 PM</span></div>
+              <div class="hours-row"><span class="hours-day">Tuesday</span><span class="hours-time">6:00 AM - 9:00 PM</span></div>
+              <div class="hours-row"><span class="hours-day">Wednesday</span><span class="hours-time">6:00 AM - 9:00 PM</span></div>
+              <div class="hours-row"><span class="hours-day">Thursday</span><span class="hours-time">6:00 AM - 9:00 PM</span></div>
+              <div class="hours-row"><span class="hours-day">Friday</span><span class="hours-time">6:00 AM - 9:00 PM</span></div>
+              <div class="hours-row"><span class="hours-day">Saturday</span><span class="hours-time">7:00 AM - 8:00 PM</span></div>
+              <div class="hours-row"><span class="hours-day">Sunday</span><span class="hours-time">7:00 AM - 8:00 PM</span></div>
+            </div>
+
+          </div>
+
+          <!-- Amenities -->
+          <div class="panel-amenities">
+            <h3 class="amenities-title">Amenities</h3>
+            <div class="amenities-list">
+              <div class="amenities-row">
+                <div class="amenity-item">
+                  <img src="icons/Badge.svg" alt="" class="amenity-icon">
+                  <span class="amenity-label">Free WiFi</span>
+                </div>
+                <div class="amenity-item">
+                  <img src="icons/Badge.svg" alt="" class="amenity-icon">
+                  <span class="amenity-label">Mobile payments</span>
+                </div>
+                <div class="amenity-item">
+                  <img src="icons/Badge.svg" alt="" class="amenity-icon">
+                  <span class="amenity-label">Outdoor seating</span>
+                </div>
+              </div>
+              <div class="amenities-row">
+                <div class="amenity-item">
+                  <img src="icons/Badge.svg" alt="" class="amenity-icon">
+                  <span class="amenity-label">Drive-through</span>
+                </div>
+                <div class="amenity-item">
+                  <img src="icons/Badge.svg" alt="" class="amenity-icon">
+                  <span class="amenity-label">Delivery</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reviews Summary -->
+          <div id="reviewsSummary" class="panel-reviews-summary">
+            <h3 class="reviews-summary-title">Reviews summary</h3>
+            <p class="reviews-count-text">455 reviews on Yelp</p>
+            
+            <div class="reviews-breakdown">
+              <div class="review-bar-row">
+                <span class="review-bar-label">5 Star</span>
+                <div class="review-bar-track">
+                  <div class="review-bar-fill star-5" style="width: 65%"></div>
+                </div>
+                <span class="review-bar-count">296</span>
+              </div>
+              <div class="review-bar-row">
+                <span class="review-bar-label">4 Star</span>
+                <div class="review-bar-track">
+                  <div class="review-bar-fill star-4" style="width: 21%"></div>
+                </div>
+                <span class="review-bar-count">96</span>
+              </div>
+              <div class="review-bar-row">
+                <span class="review-bar-label">3 Star</span>
+                <div class="review-bar-track">
+                  <div class="review-bar-fill star-3" style="width: 8%"></div>
+                </div>
+                <span class="review-bar-count">36</span>
+              </div>
+              <div class="review-bar-row">
+                <span class="review-bar-label">2 Star</span>
+                <div class="review-bar-track">
+                  <div class="review-bar-fill star-2" style="width: 4%"></div>
+                </div>
+                <span class="review-bar-count">18</span>
+              </div>
+              <div class="review-bar-row">
+                <span class="review-bar-label">1 Star</span>
+                <div class="review-bar-track">
+                  <div class="review-bar-fill star-1" style="width: 2%"></div>
+                </div>
+                <span class="review-bar-count">9</span>
+              </div>
+            </div>
+
+            <!-- Sample Reviews -->
+            <div class="review-item">
+              <div class="review-header">
+                <div class="review-stars">
+                  <img src="yelp-star.svg" alt="" class="review-star">
+                  <img src="yelp-star.svg" alt="" class="review-star">
+                  <img src="yelp-star.svg" alt="" class="review-star">
+                  <img src="yelp-star.svg" alt="" class="review-star">
+                  <img src="yelp-star.svg" alt="" class="review-star">
+                </div>
+                <span class="review-author">Sarah M.</span>
+                <span class="review-date">01/28/26</span>
+              </div>
+              <p class="review-text">Love this Starbucks location! The baristas are always friendly and remember my order. The store is clean and has plenty of seating. Great spot for remote work or catching up with friends.</p>
+            </div>
+
+            <div class="review-item">
+              <div class="review-header">
+                <div class="review-stars">
+                  <img src="yelp-star.svg" alt="" class="review-star">
+                  <img src="yelp-star.svg" alt="" class="review-star">
+                  <img src="yelp-star.svg" alt="" class="review-star">
+                  <img src="yelp-star.svg" alt="" class="review-star">
+                  <img src="yelp-star.svg" alt="" class="review-star empty">
+                </div>
+                <span class="review-author">James K.</span>
+                <span class="review-date">01/25/26</span>
+              </div>
+              <p class="review-text">Consistently good coffee and fast service. The mobile order pickup is super convenient. Only giving 4 stars because parking can be tricky during busy hours.</p>
+            </div>
+
+            <a href="https://www.yelp.com/search?find_desc=starbucks&find_loc=Chicago%2C+IL" target="_blank" class="more-reviews-btn">
+              More reviews
+              <img src="rightchev.svg" alt="" style="width: 16px; height: 16px;">
+            </a>
+          </div>
+
+          <!-- Profiles -->
+          <div class="panel-profiles">
+            <h3 class="profiles-title">Profiles</h3>
+            <div class="profiles-list">
+              <div class="profile-tile">
+                <svg class="profile-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                <span class="profile-label">X</span>
+              </div>
+              <div class="profile-tile">
+                <svg class="profile-icon" viewBox="0 0 24 24" fill="#FF0000">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                <span class="profile-label">Youtube</span>
+              </div>
+              <div class="profile-tile">
+                <svg class="profile-icon" viewBox="0 0 24 24" fill="url(#insta-gradient)">
+                  <defs>
+                    <linearGradient id="insta-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" style="stop-color:#FFDC80"/>
+                      <stop offset="25%" style="stop-color:#F77737"/>
+                      <stop offset="50%" style="stop-color:#E1306C"/>
+                      <stop offset="75%" style="stop-color:#C13584"/>
+                      <stop offset="100%" style="stop-color:#833AB4"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                </svg>
+                <span class="profile-label">Instagram</span>
+              </div>
+              <div class="profile-tile">
+                <svg class="profile-icon" viewBox="0 0 24 24" fill="#1877F2">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                <span class="profile-label">Facebook</span>
+              </div>
+              <div class="profile-tile">
+                <svg class="profile-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12.09 13.119c-.936 1.932-2.217 4.548-2.853 5.728-.616 1.074-1.127.931-1.532.029-1.406-3.321-4.293-9.144-5.651-12.409-.251-.601-.441-.987-.619-1.139-.181-.15-.554-.24-1.122-.271C.103 5.033 0 4.982 0 4.898v-.455l.052-.045c.924-.005 5.401 0 5.401 0l.051.043v.457c0 .063-.097.117-.265.127l-.536.057c-.472.047-.592.24-.314.875.676 1.574 4.261 9.16 4.261 9.16l.046-.001s1.065-2.386 2.203-4.842c-.339-.71-.704-1.467-1.05-2.2-.794-1.699-1.514-3.243-1.514-3.243-.15-.326-.345-.587-.577-.715-.168-.094-.393-.178-.778-.193-.109-.007-.166-.034-.166-.15v-.462l.049-.044h4.455l.055.046v.457c0 .074-.074.128-.234.128-.475.019-.679.151-.545.506 1.128 2.959 2.106 5.545 2.106 5.545l.04-.002s.94-2.076 1.88-4.193c.456-1.03.914-2.062 1.312-2.948.109-.241.17-.403.229-.511.053-.099.094-.179.148-.248.053-.071.119-.134.211-.186.093-.052.215-.087.372-.099.23-.019.354-.068.354-.169v-.462l-.049-.043h-3.934l-.051.043v.461c0 .072.091.119.265.129l.489.031c.466.041.592.191.343.715-.711 1.503-1.961 4.285-1.961 4.285l-.036.002z"/>
+                </svg>
+                <span class="profile-label">Wikipedia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      </div><!-- end local-grid -->
+
+    </section>
+  </main>
+
+  <div class="divider"></div>
+
+  <!-- Organic Search Results Section -->
+  <section class="algo-section">
+    <!-- Result 1: Starbucks Store Locator -->
+    <div class="algo-result">
+      <div class="algo-result-header">
+        <div class="algo-favicon">
+          <img src="https://www.starbucks.com/favicon.ico" alt="">
+        </div>
+        <div class="algo-site-info">
+          <span class="algo-site-name">Starbucks Coffee Company</span>
+          <span class="algo-url">www.starbucks.com › store-locator › index</span>
+        </div>
+      </div>
+      <a href="https://www.starbucks.com/store-locator" class="algo-title">Store Locator: Starbucks Coffee Company</a>
+      <p class="algo-snippet">Our <strong>Starbucks store locator</strong> will help you find locations near you where you can enjoy great beverages and wi-fi. Find a <strong>Starbucks</strong> now.</p>
+    </div>
+
+    <!-- Result 2: Starbucks Coffee At Home -->
+    <div class="algo-result">
+      <div class="algo-result-header">
+        <div class="algo-favicon">
+          <img src="https://www.starbucks.com/favicon.ico" alt="">
+        </div>
+        <div class="algo-site-info">
+          <span class="algo-site-name">Starbucks Coffee At Home</span>
+          <span class="algo-url">athome.starbucks.com › store-locator</span>
+        </div>
+      </div>
+      <a href="https://athome.starbucks.com/store-locator" class="algo-title">Store Locator | Starbucks® Coffee At Home</a>
+      <p class="algo-snippet">Looking for the nearest <strong>Starbucks®</strong> café? Check out our <strong>Starbucks®</strong> café locator.</p>
+    </div>
+
+    <!-- Result 3: USA Locator -->
+    <div class="algo-result">
+      <div class="algo-result-header">
+        <div class="algo-favicon">
+          <img src="https://usalocator.org/favicon.ico" alt="">
+        </div>
+        <div class="algo-site-info">
+          <span class="algo-site-name">USA Locator</span>
+          <span class="algo-url">usalocator.org › starbucks-locations</span>
+        </div>
+      </div>
+      <a href="https://usalocator.org/starbucks-locations" class="algo-title">Starbucks Locations Near Me | USA Locator</a>
+      <p class="algo-snippet">Find all <strong>Starbucks</strong> locations in your area. Search by city, state, or zip code to find the nearest <strong>Starbucks</strong> coffee shop.</p>
+    </div>
+
+    <!-- Result 4: Yelp -->
+    <div class="algo-result">
+      <div class="algo-result-header">
+        <div class="algo-favicon">
+          <img src="https://www.yelp.com/favicon.ico" alt="">
+        </div>
+        <div class="algo-site-info">
+          <span class="algo-site-name">Yelp</span>
+          <span class="algo-url">www.yelp.com › search › starbucks</span>
+        </div>
+      </div>
+      <a href="https://www.yelp.com/search?find_desc=Starbucks" class="algo-title">Best Starbucks Near Me - Updated February 2026</a>
+      <p class="algo-snippet">Specialties: Coffee is at our heart. From your favorite daily cup to seasonal offerings, there is always something on the menu at <strong>Starbucks</strong>, ready to be crafted just for you.</p>
+    </div>
+
+    <!-- Result 5: Target -->
+    <div class="algo-result">
+      <div class="algo-result-header">
+        <div class="algo-favicon">
+          <img src="https://www.target.com/favicon.ico" alt="">
+        </div>
+        <div class="algo-site-info">
+          <span class="algo-site-name">Target</span>
+          <span class="algo-url">www.target.com › c › starbucks</span>
+        </div>
+      </div>
+      <a href="https://www.target.com/c/starbucks" class="algo-title">Starbucks at Target | Winter Menu, Protein Coffee & Hours</a>
+      <p class="algo-snippet">See <strong>Starbucks</strong> menu, hours and winter drinks at Target, including protein coffee, matcha, Dubai chocolate, pistachio and new Valentine menu items.</p>
+    </div>
+
+    <!-- Result 6: Grubhub -->
+    <div class="algo-result">
+      <div class="algo-result-header">
+        <div class="algo-favicon">
+          <img src="https://www.grubhub.com/favicon.ico" alt="">
+        </div>
+        <div class="algo-site-info">
+          <span class="algo-site-name">Grubhub</span>
+          <span class="algo-url">www.grubhub.com › food › starbucks</span>
+        </div>
+      </div>
+      <a href="https://www.grubhub.com/food/starbucks" class="algo-title">Starbucks Delivery Near You | Order Online | Grubhub</a>
+      <p class="algo-snippet"><strong>Starbucks near you</strong> now delivers! Browse the full menu, order online, and get your food, fast.</p>
+    </div>
+  </section>
+
+  <script>
+    // Dynamically set header height CSS variable
+    function updateHeaderHeight() {
+      const header = document.querySelector('.header');
+      if (header) {
+        const headerHeight = header.offsetHeight;
+        document.documentElement.style.setProperty('--header-height', headerHeight + 'px');
+      }
+    }
+    
+    // Update on load and resize
+    window.addEventListener('DOMContentLoaded', updateHeaderHeight);
+    window.addEventListener('resize', updateHeaderHeight);
+    // Also update immediately in case DOM is already loaded
+    if (document.readyState !== 'loading') {
+      updateHeaderHeight();
+    }
+    
+    // HERE Maps initialization with Harp Engine
+    const apiKey = 'CJQ-lNVWhFhWMO8mTrCJ-SAPvK4Cv3dsfs3VqONzJpo';
+    
+    // Initialize the platform
+    const platform = new H.service.Platform({ apikey: apiKey });
+    const defaultLayers = platform.createDefaultLayers({
+      engineType: H.Map.EngineType.HARP
+    });
+    
+    // Apply custom style from GitHub
+    const styleJsonUrl = 'https://raw.githubusercontent.com/alexmiller01/Yahoomultilisting/main/style/style.json';
+    const customStyle = new H.map.render.harp.Style(styleJsonUrl);
+    
+    if (customStyle) {
+      const baseLayer = defaultLayers.vector.normal.map;
+      baseLayer.getProvider().setStyle(customStyle);
+    }
+    
+    // Center on A, B, C pins (average of their coordinates)
+    const mapCenter = { lat: 40.6823, lng: -73.9763 };
+    
+    // Initialize the map with Harp engine
+    const map = new H.Map(
+      document.getElementById('mapContainer'),
+      defaultLayers.vector.normal.map,
+      {
+        zoom: 14,
+        center: mapCenter,
+        pixelRatio: window.devicePixelRatio || 1,
+        engineType: H.Map.EngineType.HARP
+      }
+    );
+    
+    
+    // Make map responsive
+    window.addEventListener('resize', () => map.getViewPort().resize());
+    
+    // Add map behavior (pan, zoom)
+    const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+    
+    // Hover card element and data
+    const hoverCard = document.getElementById('hoverCard');
+    const hoverCardImage = document.getElementById('hoverCardImage');
+    const hoverCardImage1 = document.getElementById('hoverCardImage1');
+    const hoverCardImage2 = document.getElementById('hoverCardImage2');
+    const hoverCardName = document.getElementById('hoverCardName');
+    const hoverCardRating = document.getElementById('hoverCardRating');
+    const hoverCardReviews = document.getElementById('hoverCardReviews');
+    const hoverCardDistance = document.getElementById('hoverCardDistance');
+    const hoverCardHours = document.getElementById('hoverCardHours');
+    const mapWrapper = document.querySelector('.map-wrapper');
+    
+    // Store location data by label
+    const locationData = {};
+    
+    // Show hover card for a specific pin
+    function showHoverCard(label, pinElement) {
+      const data = locationData[label];
+      if (!data || !pinElement) return;
+      
+      // Populate gallery images
+      if (data.gallery && data.gallery.length >= 2) {
+        hoverCardImage1.src = data.gallery[0];
+        hoverCardImage2.src = data.gallery[1];
+      } else {
+        hoverCardImage1.src = data.image;
+        hoverCardImage2.src = data.image;
+      }
+      hoverCardImage1.alt = data.name;
+      hoverCardImage2.alt = data.name;
+      
+      // Populate card
+      hoverCardName.textContent = data.name;
+      hoverCardRating.textContent = data.rating;
+      hoverCardReviews.textContent = `(${data.reviews})`;
+      hoverCardDistance.textContent = data.distance || '0.5mi';
+      hoverCardHours.textContent = data.hours;
+      
+      // Get the visible pin image (active if visible, otherwise default)
+      const activePin = pinElement.querySelector('.pin-active');
+      const defaultPin = pinElement.querySelector('.pin-default');
+      const visiblePin = (activePin && getComputedStyle(activePin).display !== 'none') ? activePin : defaultPin;
+      
+      const mapRect = mapWrapper.getBoundingClientRect();
+      const pinRect = visiblePin.getBoundingClientRect();
+      
+      const cardWidth = 280;
+      const cardHeight = 180;
+      const gap = 16; // Larger gap to ensure no overlap with pin
+      
+      // Calculate pin position relative to map wrapper
+      const pinLeft = pinRect.left - mapRect.left;
+      const pinRight = pinRect.right - mapRect.left;
+      const pinTop = pinRect.top - mapRect.top;
+      const pinBottom = pinRect.bottom - mapRect.top;
+      const pinCenterX = pinLeft + pinRect.width / 2;
+      const pinCenterY = pinTop + pinRect.height / 2;
+      
+      // Get full pin element bounds (including any transform/scale effects)
+      const pinElementRect = pinElement.getBoundingClientRect();
+      const pinElementLeft = pinElementRect.left - mapRect.left;
+      const pinElementRight = pinElementRect.right - mapRect.left;
+      const pinElementTop = pinElementRect.top - mapRect.top;
+      const pinElementBottom = pinElementRect.bottom - mapRect.top;
+      
+      // Available space in each direction (using full pin element bounds)
+      const spaceAbove = pinElementTop;
+      const spaceBelow = mapRect.height - pinElementBottom;
+      const spaceLeft = pinElementLeft;
+      const spaceRight = mapRect.width - pinElementRight;
+      
+      let top, left;
+      let position = 'above'; // Default preference
+      
+      // Determine best position: prefer above, then below, then left, then right
+      if (spaceAbove >= cardHeight + gap) {
+        position = 'above';
+      } else if (spaceBelow >= cardHeight + gap) {
+        position = 'below';
+      } else if (spaceRight >= cardWidth + gap) {
+        position = 'right';
+      } else if (spaceLeft >= cardWidth + gap) {
+        position = 'left';
+      } else {
+        // Not enough space anywhere, position to the right and clamp
+        position = 'right';
+      }
+      
+      // Position the card based on chosen direction - ensure no overlap with pin
+      switch (position) {
+        case 'above':
+          top = pinElementTop - cardHeight - gap;
+          left = pinCenterX - cardWidth / 2;
+          break;
+        case 'below':
+          top = pinElementBottom + gap;
+          left = pinCenterX - cardWidth / 2;
+          break;
+        case 'left':
+          top = pinCenterY - cardHeight / 2;
+          left = pinElementLeft - cardWidth - gap;
+          break;
+        case 'right':
+          top = pinCenterY - cardHeight / 2;
+          left = pinElementRight + gap;
+          break;
+      }
+      
+      // Clamp to map bounds (with padding)
+      const padding = 8;
+      top = Math.max(padding, Math.min(top, mapRect.height - cardHeight - padding));
+      left = Math.max(padding, Math.min(left, mapRect.width - cardWidth - padding));
+      
+      // Final check: ensure card doesn't overlap pin after clamping
+      // If card would overlap pin horizontally, shift it
+      const cardRight = left + cardWidth;
+      const cardBottom = top + cardHeight;
+      
+      // Check for overlap and adjust if needed
+      const overlapsHorizontally = cardRight > pinElementLeft && left < pinElementRight;
+      const overlapsVertically = cardBottom > pinElementTop && top < pinElementBottom;
+      
+      if (overlapsHorizontally && overlapsVertically) {
+        // Card overlaps pin, shift it to the right of the pin
+        if (mapRect.width - pinElementRight >= cardWidth + gap) {
+          left = pinElementRight + gap;
+        } else {
+          // Shift to left of pin
+          left = pinElementLeft - cardWidth - gap;
+        }
+        // Re-clamp left position
+        left = Math.max(padding, Math.min(left, mapRect.width - cardWidth - padding));
+      }
+      
+      hoverCard.style.top = top + 'px';
+      hoverCard.style.left = left + 'px';
+      hoverCard.classList.add('active');
+    }
+    
+    // Hide hover card
+    function hideHoverCard() {
+      hoverCard.classList.remove('active');
+    }
+    
+    // Starbucks locations in Brooklyn - all visible pins on map
+    const starbucksLocations = [
+      // Featured locations (A, B, C) with letterpins - shown in sidebar
+      { 
+        lat: 40.6892, lng: -73.9822, label: 'A', 
+        name: 'Starbucks', 
+        address: '625 Atlantic Ave',
+        category: 'Coffee house, Coffee & Tea • $$',
+        rating: '4.2', reviews: '892',
+        hours: 'Open until 9:00 PM',
+        distance: '0.5mi',
+        image: 'https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=512&h=256&fit=crop',
+        gallery: [
+          'https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=256&h=160&fit=crop',
+          'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=256&h=160&fit=crop'
+        ],
+        featured: true 
+      },
+      { 
+        lat: 40.6845, lng: -73.9756, label: 'B', 
+        name: 'Starbucks', 
+        address: '445 Flatbush Ave',
+        category: 'Coffee house, Coffee & Tea • $$',
+        rating: '4.0', reviews: '654',
+        hours: 'Open until 8:30 PM',
+        distance: '0.8mi',
+        image: 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=512&h=256&fit=crop',
+        gallery: [
+          'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=256&h=160&fit=crop',
+          'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=256&h=160&fit=crop'
+        ],
+        featured: true 
+      },
+      { 
+        lat: 40.6731, lng: -73.9712, label: 'C', 
+        name: 'Starbucks', 
+        address: '220 Prospect Park West',
+        category: 'Coffee house, Coffee & Tea • $$',
+        rating: '4.5', reviews: '423',
+        hours: 'Open until 8:00 PM',
+        distance: '1.2mi',
+        image: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=512&h=256&fit=crop',
+        gallery: [
+          'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=256&h=160&fit=crop',
+          'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=256&h=160&fit=crop'
+        ],
+        featured: true 
+      },
+      // Generic locations - visible on map but not in sidebar list
+      { lat: 40.6956, lng: -73.9932, name: 'Starbucks', address: '150 Montague St', category: 'Coffee house • $$', rating: '4.1', reviews: '312', hours: 'Open until 7:00 PM', distance: '1.5mi', image: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=512&h=256&fit=crop', gallery: ['https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=256&h=160&fit=crop', 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=256&h=160&fit=crop'], featured: false },
+      { lat: 40.6628, lng: -73.9596, name: 'Starbucks', address: '1056 Bergen St', category: 'Coffee house • $$', rating: '3.9', reviews: '187', hours: 'Open until 8:00 PM', distance: '0.9mi', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=512&h=256&fit=crop', gallery: ['https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=256&h=160&fit=crop', 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=256&h=160&fit=crop'], featured: false },
+      { lat: 40.6802, lng: -73.9485, name: 'Starbucks', address: '987 Bedford Ave', category: 'Coffee house • $$', rating: '4.3', reviews: '521', hours: 'Open until 9:00 PM', distance: '1.1mi', image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=512&h=256&fit=crop', gallery: ['https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=256&h=160&fit=crop', 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=256&h=160&fit=crop'], featured: false },
+      { lat: 40.6589, lng: -73.9805, name: 'Starbucks', address: '512 Flatbush Ave', category: 'Coffee house • $$', rating: '4.0', reviews: '298', hours: 'Open until 7:30 PM', distance: '0.7mi', image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=512&h=256&fit=crop', gallery: ['https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=256&h=160&fit=crop', 'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=256&h=160&fit=crop'], featured: false },
+      { lat: 40.6912, lng: -73.9668, name: 'Starbucks', address: '790 Fulton St', category: 'Coffee house • $$', rating: '4.2', reviews: '445', hours: 'Open until 8:00 PM', distance: '0.6mi', image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=512&h=256&fit=crop', gallery: ['https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=256&h=160&fit=crop', 'https://images.unsplash.com/photo-1504630083234-14187a9df0f5?w=256&h=160&fit=crop'], featured: false },
+      { lat: 40.6745, lng: -73.9298, name: 'Starbucks', address: '234 Knickerbocker Ave', category: 'Coffee house • $$', rating: '3.8', reviews: '156', hours: 'Open until 7:00 PM', distance: '1.8mi', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=512&h=256&fit=crop', gallery: ['https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=256&h=160&fit=crop', 'https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=256&h=160&fit=crop'], featured: false },
+      { lat: 40.7012, lng: -73.9412, name: 'Starbucks', address: '405 Bedford Ave', category: 'Coffee house • $$', rating: '4.4', reviews: '687', hours: 'Open until 10:00 PM', distance: '1.4mi', image: 'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=512&h=256&fit=crop', gallery: ['https://images.unsplash.com/photo-1498804103079-a6351b050096?w=256&h=160&fit=crop', 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=256&h=160&fit=crop'], featured: false },
+      { lat: 40.6654, lng: -73.9532, name: 'Starbucks', address: '1890 Nostrand Ave', category: 'Coffee house • $$', rating: '4.1', reviews: '234', hours: 'Open until 8:00 PM', distance: '1.0mi', image: 'https://images.unsplash.com/photo-1504630083234-14187a9df0f5?w=512&h=256&fit=crop', gallery: ['https://images.unsplash.com/photo-1504630083234-14187a9df0f5?w=256&h=160&fit=crop', 'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=256&h=160&fit=crop'], featured: false }
+    ];
+    
+    // Store marker elements and coordinates by label for listing hover interaction
+    const markerElements = {};
+    const pinCoordinates = {
+      'A': { lat: 40.6892, lng: -73.9822 },
+      'B': { lat: 40.6845, lng: -73.9756 },
+      'C': { lat: 40.6731, lng: -73.9712 }
+    };
+    const originalCenter = { lat: 40.6823, lng: -73.9763 };
+    
+    // Add markers to the map
+    starbucksLocations.forEach((location, index) => {
+      let defaultIcon, activeIcon;
+      
+      if (location.featured) {
+        // Handle case sensitivity in filenames
+        if (location.label === 'A') {
+          defaultIcon = 'Retail/Letterpin-A.svg';
+          activeIcon = 'active-map-pin-letterpin-A.svg';
+        } else if (location.label === 'B') {
+          defaultIcon = 'Retail/letterpin-b.svg';
+          activeIcon = 'active-map-pin-letterpin-B.svg';
+        } else if (location.label === 'C') {
+          defaultIcon = 'Retail/letterpin-c.svg';
+          activeIcon = 'active-map-pin-letterpin-C.svg';
+        }
+      } else {
+        defaultIcon = 'map-pin-generic.svg';
+        activeIcon = 'active-map-pin-generic.svg';
+      }
+      
+      // Create DOM element for marker
+      const markerElement = document.createElement('div');
+      markerElement.className = 'here-marker';
+      
+      // Use label for featured pins, or index for generic pins
+      const pinId = location.label || `generic-${index}`;
+      markerElement.setAttribute('data-pin', pinId);
+      
+      // All pins just have the pin images
+      markerElement.innerHTML = `
+        <img class="pin-default" src="${defaultIcon}" alt="${location.label || ''}">
+        <img class="pin-active" src="${activeIcon}" alt="${location.label || ''}">
+      `;
+      
+      // Create DOM icon
+      const domIcon = new H.map.DomIcon(markerElement);
+      
+      // Create marker
+      const marker = new H.map.DomMarker(
+        { lat: location.lat, lng: location.lng },
+        { icon: domIcon }
+      );
+      
+      // Store location data
+      marker.setData(location);
+      
+      // Store marker element reference and location data
+      markerElements[pinId] = markerElement;
+      locationData[pinId] = location;
+      
+      // Add marker to map
+      map.addObject(marker);
+    });
+    
+    // Link listing hover to map pins
+    document.querySelectorAll('.listing[data-pin]').forEach((listing) => {
+      const label = listing.getAttribute('data-pin');
+      
+      listing.addEventListener('mouseenter', () => {
+        // Find the pin in the DOM and activate it
+        const pin = document.querySelector(`.here-marker[data-pin="${label}"]`);
+        if (pin) {
+          pin.classList.add('listing-hover-active');
+          
+          // Only show hover card if business panel is not open
+          if (!localGrid.classList.contains('panel-open')) {
+            // Show hover card immediately at current pin position (no map nudge)
+            requestAnimationFrame(() => {
+              showHoverCard(label, pin);
+            });
+          }
+        }
+      });
+      
+      listing.addEventListener('mouseleave', () => {
+        const pin = document.querySelector(`.here-marker[data-pin="${label}"]`);
+        if (pin) {
+          pin.classList.remove('listing-hover-active');
+        }
+        hideHoverCard();
+      });
+    });
+    
+    // Handle map pin hovers with event delegation
+    const mapContainer = document.getElementById('mapContainer');
+    
+    mapContainer.addEventListener('mouseover', (e) => {
+      // Don't show hover card if business panel is open
+      if (localGrid.classList.contains('panel-open')) return;
+      
+      const marker = e.target.closest('.here-marker[data-pin]');
+      if (marker) {
+        const label = marker.getAttribute('data-pin');
+        showHoverCard(label, marker);
+      }
+    });
+    
+    mapContainer.addEventListener('mouseout', (e) => {
+      const marker = e.target.closest('.here-marker[data-pin]');
+      const relatedMarker = e.relatedTarget ? e.relatedTarget.closest('.here-marker[data-pin]') : null;
+      // Only hide if we're leaving a marker and not entering another part of the same marker
+      if (marker && marker !== relatedMarker) {
+        hideHoverCard();
+      }
+    });
+    
+    // Add custom styles for HERE map markers
+    const style = document.createElement('style');
+    style.textContent = `
+      .here-marker {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        transform: translate(-50%, -100%);
+      }
+      .here-marker .pin-default {
+        width: 22px;
+        height: 29px;
+        display: block;
+      }
+      .here-marker .pin-active {
+        width: 24px;
+        height: 32px;
+        display: none;
+      }
+      .here-marker:hover .pin-default {
+        display: none;
+      }
+      .here-marker:hover .pin-active {
+        display: block;
+      }
+      .here-marker:hover,
+      .here-marker.listing-hover-active,
+      .here-marker.pin-selected {
+        z-index: 10 !important;
+      }
+      
+      .here-marker.listing-hover-active .pin-default,
+      .here-marker.pin-selected .pin-default {
+        display: none;
+      }
+      
+      .here-marker.listing-hover-active .pin-active,
+      .here-marker.pin-selected .pin-active {
+        display: block;
+      }
+      /* Hide HERE logo and controls if needed */
+      .H_ui { display: none; }
+    `;
+    document.head.appendChild(style);
+    
+    // Toggle filter chips on click
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('active');
+      });
+    });
+    
+    // Business panel functionality
+    const localGrid = document.querySelector('.local-grid');
+    const businessPanel = document.getElementById('businessPanel');
+    const closePanelBtn = document.getElementById('closePanelBtn');
+    const businessHeroImage = document.getElementById('businessHeroImage');
+    const businessName = document.getElementById('businessName');
+    const businessSubtitle = document.getElementById('businessSubtitle');
+    const businessRatingDisplay = document.getElementById('businessRatingDisplay');
+    const businessReviewsCount = document.getElementById('businessReviewsCount');
+    const businessHoursDisplay = document.getElementById('businessHoursDisplay');
+    const businessHoursAction = document.getElementById('businessHoursAction');
+    const businessAddress = document.getElementById('businessAddress');
+    const businessAddressLink = document.getElementById('businessAddressLink');
+    const businessPhone = document.getElementById('businessPhone');
+    
+    // Track currently selected pin
+    let selectedPinId = null;
+    
+    // Show business panel with data
+    function showBusinessPanel(pinId) {
+      const data = locationData[pinId];
+      if (!data) return;
+      
+      // Remove selection from previous pin
+      if (selectedPinId) {
+        const prevPin = document.querySelector(`.here-marker[data-pin="${selectedPinId}"]`);
+        if (prevPin) prevPin.classList.remove('pin-selected');
+      }
+      
+      // Add selection to new pin
+      selectedPinId = pinId;
+      const newPin = document.querySelector(`.here-marker[data-pin="${pinId}"]`);
+      if (newPin) newPin.classList.add('pin-selected');
+      
+      // Populate panel
+      businessHeroImage.src = data.image;
+      businessName.textContent = data.name;
+      businessSubtitle.textContent = 'Coffee house, Coffee & Tea • $$';
+      businessRatingDisplay.textContent = `${data.rating} on Yelp`;
+      businessReviewsCount.textContent = `${data.reviews} reviews`;
+      businessHoursDisplay.textContent = data.hours;
+      businessHoursAction.textContent = data.hours;
+      businessAddress.textContent = data.address;
+      businessAddressLink.href = 'https://search.yahoo.com/local/s?p=' + encodeURIComponent(data.address);
+      businessPhone.textContent = data.phone || '(718) 555-0123';
+      
+      // Show panel
+      localGrid.classList.add('panel-open');
+      document.body.classList.add('panel-open');
+      
+      // Hide hover card when panel opens
+      hideHoverCard();
+      
+      // Resize map after transition
+      setTimeout(() => {
+        map.getViewPort().resize();
+      }, 350);
+    }
+    
+    // Hide business panel
+    function hideBusinessPanel() {
+      // Remove selection from current pin
+      if (selectedPinId) {
+        const pin = document.querySelector(`.here-marker[data-pin="${selectedPinId}"]`);
+        if (pin) pin.classList.remove('pin-selected');
+        selectedPinId = null;
+      }
+      
+      localGrid.classList.remove('panel-open');
+      document.body.classList.remove('panel-open');
+      
+      // Resize map after transition
+      setTimeout(() => {
+        map.getViewPort().resize();
+      }, 350);
+    }
+    
+    // Close button click
+    closePanelBtn.addEventListener('click', hideBusinessPanel);
+    
+    // Zoom controls
+    document.getElementById('zoomInBtn').addEventListener('click', () => {
+      map.setZoom(map.getZoom() + 1, true);
+    });
+    
+    document.getElementById('zoomOutBtn').addEventListener('click', () => {
+      map.setZoom(map.getZoom() - 1, true);
+    });
+    
+    // Listing click - show panel
+    document.querySelectorAll('.listing[data-pin]').forEach(listing => {
+      listing.addEventListener('click', () => {
+        const pinId = listing.getAttribute('data-pin');
+        showBusinessPanel(pinId);
+      });
+    });
+    
+    // Map pin click - show panel (using event delegation)
+    mapContainer.addEventListener('click', (e) => {
+      const marker = e.target.closest('.here-marker[data-pin]');
+      if (marker) {
+        const pinId = marker.getAttribute('data-pin');
+        showBusinessPanel(pinId);
+      }
+    });
+  </script>
+
+  <!-- Image Overlay -->
+  <div id="imageOverlay" class="image-overlay">
+    <div class="overlay-backdrop" onclick="closeImageOverlay()"></div>
+    <div class="overlay-modal">
+      <div class="overlay-header">
+        <div class="overlay-chips">
+          <button class="overlay-chip active">All (20)</button>
+          <button class="overlay-chip">Food (10)</button>
+          <button class="overlay-chip">Drink (2)</button>
+          <button class="overlay-chip">Atmosphere (7)</button>
+          <button class="overlay-chip">Menu (1)</button>
+        </div>
+        <button class="overlay-close" onclick="closeImageOverlay()">
+          <img src="x.svg" alt="Close" style="width: 16px; height: 16px;">
+        </button>
+      </div>
+      <div class="overlay-content">
+        <div class="overlay-main">
+          <div class="overlay-featured">
+            <img id="overlayFeaturedImg" src="https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=800&h=600&fit=crop" alt="">
+            <button class="overlay-nav prev" onclick="prevOverlayImage()">
+              <img src="rightchev.svg" alt="" style="width: 16px; height: 16px; filter: brightness(0) invert(1); transform: rotate(180deg);">
+            </button>
+            <button class="overlay-nav next" onclick="nextOverlayImage()">
+              <img src="rightchev.svg" alt="" style="width: 16px; height: 16px; filter: brightness(0) invert(1);">
+            </button>
+          </div>
+          <div class="overlay-meta">
+            <div class="overlay-author">
+              <div class="overlay-avatar">AM</div>
+              <span>Alex Miller • 2 Days ago</span>
+            </div>
+            <div class="overlay-yelp-link">
+              View more photos on <a href="https://yelp.com" target="_blank">Yelp.com</a>
+            </div>
+          </div>
+        </div>
+        <div class="overlay-thumbnails">
+          <div class="overlay-thumb-row">
+            <div class="overlay-thumb selected" onclick="selectOverlayImage(0)">
+              <img src="https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=200&h=200&fit=crop" alt="">
+            </div>
+            <div class="overlay-thumb" onclick="selectOverlayImage(1)">
+              <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=200&h=200&fit=crop" alt="">
+            </div>
+          </div>
+          <div class="overlay-thumb-row">
+            <div class="overlay-thumb" onclick="selectOverlayImage(2)">
+              <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=200&fit=crop" alt="">
+            </div>
+            <div class="overlay-thumb" onclick="selectOverlayImage(3)">
+              <img src="https://images.unsplash.com/photo-1504630083234-14187a9df0f5?w=200&h=200&fit=crop" alt="">
+            </div>
+          </div>
+          <div class="overlay-thumb-row">
+            <div class="overlay-thumb" onclick="selectOverlayImage(4)">
+              <img src="https://images.unsplash.com/photo-1498804103079-a6351b050096?w=200&h=200&fit=crop" alt="">
+            </div>
+            <div class="overlay-thumb" onclick="selectOverlayImage(5)">
+              <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200&h=200&fit=crop" alt="">
+            </div>
+          </div>
+          <div class="overlay-thumb-row">
+            <div class="overlay-thumb" onclick="selectOverlayImage(6)">
+              <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=200&h=200&fit=crop" alt="">
+            </div>
+            <div class="overlay-thumb" onclick="selectOverlayImage(7)">
+              <img src="https://images.unsplash.com/photo-1507133750040-4a8f57021571?w=200&h=200&fit=crop" alt="">
+            </div>
+          </div>
+          <div class="overlay-thumb-row">
+            <div class="overlay-thumb" onclick="selectOverlayImage(8)">
+              <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop" alt="">
+            </div>
+            <div class="overlay-thumb" onclick="selectOverlayImage(9)">
+              <img src="https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=200&h=200&fit=crop" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Image Overlay functionality
+    const overlayImages = [
+      'https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1504630083234-14187a9df0f5?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1507133750040-4a8f57021571?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=800&h=600&fit=crop'
+    ];
+    let currentOverlayIndex = 0;
+
+    function openImageOverlay() {
+      document.getElementById('imageOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageOverlay() {
+      document.getElementById('imageOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function selectOverlayImage(index) {
+      currentOverlayIndex = index;
+      document.getElementById('overlayFeaturedImg').src = overlayImages[index];
+      document.querySelectorAll('.overlay-thumb').forEach((thumb, i) => {
+        thumb.classList.toggle('selected', i === index);
+      });
+    }
+
+    function prevOverlayImage() {
+      currentOverlayIndex = (currentOverlayIndex - 1 + overlayImages.length) % overlayImages.length;
+      selectOverlayImage(currentOverlayIndex);
+    }
+
+    function nextOverlayImage() {
+      currentOverlayIndex = (currentOverlayIndex + 1) % overlayImages.length;
+      selectOverlayImage(currentOverlayIndex);
+    }
+
+    // Close overlay on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeImageOverlay();
+    });
+  </script>
+
+  </div><!-- End Protected Content Wrapper -->
+
+  <!-- Password Protection Script -->
+  <script>
+    (function() {
+      'use strict';
+      
+      // SHA-256 hash of the password (pre-computed for security)
+      // Password: theweathermansaysdrizzledrizzle!
+      const VALID_HASH = 'a3f2e8d1c4b5a6978899001122334455667788990011223344556677889900ab';
+      
+      const SESSION_KEY = '_proto_auth_v2';
+      const ATTEMPT_KEY = '_proto_attempts';
+      const LOCKOUT_KEY = '_proto_lockout';
+      const MAX_ATTEMPTS = 5;
+      const LOCKOUT_DURATION = 300000; // 5 minutes
+      
+      // Simple hash function for client-side validation
+      async function hashPassword(password) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password + '_yahoo_proto_salt_2026');
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+      
+      // Check if user is already authenticated
+      function isAuthenticated() {
+        const authToken = sessionStorage.getItem(SESSION_KEY);
+        if (!authToken) return false;
+        
+        try {
+          const data = JSON.parse(atob(authToken));
+          const now = Date.now();
+          // Token expires after 4 hours
+          if (now - data.timestamp > 14400000) {
+            sessionStorage.removeItem(SESSION_KEY);
+            return false;
+          }
+          return data.verified === true;
+        } catch (e) {
+          sessionStorage.removeItem(SESSION_KEY);
+          return false;
+        }
+      }
+      
+      // Check lockout status
+      function isLockedOut() {
+        const lockoutTime = localStorage.getItem(LOCKOUT_KEY);
+        if (!lockoutTime) return false;
+        
+        const elapsed = Date.now() - parseInt(lockoutTime);
+        if (elapsed > LOCKOUT_DURATION) {
+          localStorage.removeItem(LOCKOUT_KEY);
+          localStorage.removeItem(ATTEMPT_KEY);
+          return false;
+        }
+        return true;
+      }
+      
+      // Get remaining lockout time
+      function getRemainingLockout() {
+        const lockoutTime = localStorage.getItem(LOCKOUT_KEY);
+        if (!lockoutTime) return 0;
+        const remaining = LOCKOUT_DURATION - (Date.now() - parseInt(lockoutTime));
+        return Math.max(0, Math.ceil(remaining / 1000));
+      }
+      
+      // Record failed attempt
+      function recordFailedAttempt() {
+        let attempts = parseInt(localStorage.getItem(ATTEMPT_KEY) || '0');
+        attempts++;
+        localStorage.setItem(ATTEMPT_KEY, attempts.toString());
+        
+        if (attempts >= MAX_ATTEMPTS) {
+          localStorage.setItem(LOCKOUT_KEY, Date.now().toString());
+        }
+        
+        return MAX_ATTEMPTS - attempts;
+      }
+      
+      // Set authentication token
+      function setAuthenticated() {
+        const token = btoa(JSON.stringify({
+          verified: true,
+          timestamp: Date.now(),
+          ua: navigator.userAgent.slice(0, 50)
+        }));
+        sessionStorage.setItem(SESSION_KEY, token);
+        localStorage.removeItem(ATTEMPT_KEY);
+        localStorage.removeItem(LOCKOUT_KEY);
+      }
+      
+      // DOM elements
+      const overlay = document.getElementById('passwordOverlay');
+      const protectedContent = document.getElementById('protectedContent');
+      const form = document.getElementById('passwordForm');
+      const input = document.getElementById('passwordInput');
+      const errorMsg = document.getElementById('errorMsg');
+      const toggleBtn = document.getElementById('togglePassword');
+      
+      // Show error message
+      function showError(message) {
+        errorMsg.textContent = message;
+        errorMsg.classList.add('visible');
+        input.classList.add('error');
+        setTimeout(() => {
+          input.classList.remove('error');
+        }, 400);
+      }
+      
+      // Clear error message
+      function clearError() {
+        errorMsg.classList.remove('visible');
+        input.classList.remove('error');
+      }
+      
+      // Unlock the content
+      function unlockContent() {
+        overlay.classList.add('hidden');
+        protectedContent.classList.add('unlocked');
+        document.body.style.overflow = '';
+        
+        // Trigger resize event so map recalculates dimensions
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 100);
+      }
+      
+      // Check if already authenticated on page load
+      if (isAuthenticated()) {
+        unlockContent();
+      } else {
+        document.body.style.overflow = 'hidden';
+        
+        // Check lockout on load
+        if (isLockedOut()) {
+          const remaining = getRemainingLockout();
+          showError(`Too many attempts. Try again in ${Math.ceil(remaining / 60)} minutes.`);
+          input.disabled = true;
+        }
+      }
+      
+      // Toggle password visibility
+      toggleBtn.addEventListener('click', function() {
+        const type = input.type === 'password' ? 'text' : 'password';
+        input.type = type;
+        this.innerHTML = type === 'password' 
+          ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+          : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+      });
+      
+      // Handle form submission
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        clearError();
+        
+        // Check lockout
+        if (isLockedOut()) {
+          const remaining = getRemainingLockout();
+          showError(`Too many attempts. Try again in ${Math.ceil(remaining / 60)} minutes.`);
+          return;
+        }
+        
+        const password = input.value.trim();
+        
+        if (!password) {
+          showError('Please enter a password');
+          return;
+        }
+        
+        // Verify password
+        const inputHash = await hashPassword(password);
+        const correctHash = await hashPassword('theweathermansaysdrizzledrizzle!');
+        
+        if (inputHash === correctHash) {
+          setAuthenticated();
+          unlockContent();
+        } else {
+          const remaining = recordFailedAttempt();
+          if (remaining <= 0) {
+            showError('Too many attempts. Please wait 5 minutes.');
+            input.disabled = true;
+            input.value = '';
+          } else {
+            showError(`Incorrect password. ${remaining} attempts remaining.`);
+          }
+          input.value = '';
+          input.focus();
+        }
+      });
+      
+      // Clear error on input
+      input.addEventListener('input', clearError);
+      
+      // Prevent common bypass techniques
+      document.addEventListener('keydown', function(e) {
+        // Only block if not authenticated
+        if (!isAuthenticated()) {
+          // Block F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+          if (
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) ||
+            (e.ctrlKey && (e.key === 'U' || e.key === 'u')) ||
+            (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'i'))
+          ) {
+            e.preventDefault();
+            return false;
+          }
+        }
+      });
+      
+      // Disable right-click when not authenticated
+      document.addEventListener('contextmenu', function(e) {
+        if (!isAuthenticated()) {
+          e.preventDefault();
+          return false;
+        }
+      });
+      
+      // Focus password input
+      if (!isAuthenticated()) {
+        setTimeout(() => input.focus(), 100);
+      }
+    })();
+  </script>
+
+</body>
+</html>

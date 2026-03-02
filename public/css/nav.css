@@ -1,0 +1,268 @@
+/**
+ * Navigation header – UDS tokens, Figma 976:8180
+ * Grid: 1146px
+ */
+
+.nav-header {
+  background: var(--uds-background-primary);
+  border-bottom: var(--uds-border-thin) solid var(--uds-line-secondary);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-inner {
+  max-width: 1146px;
+  margin: 0 auto;
+  padding: 20px var(--uds-space-lg) 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Top row: logo + search + nav icons */
+.nav-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: -120px;
+}
+
+.nav-front {
+  display: flex;
+  align-items: center;
+  gap: var(--uds-space-lg);
+  flex: 1;
+  min-width: 0;
+  padding-right: var(--uds-space-lg);
+}
+
+.nav-logo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.nav-logo img {
+  height: 24px;
+  width: 86px;
+}
+
+/* Search box – Figma: pill, bg secondary, border line/primary */
+.nav-search-wrap {
+  flex: 1;
+  max-width: 842px;
+}
+
+.nav-search-box {
+  background: var(--uds-background-secondary);
+  border: var(--uds-border-thin) solid var(--uds-line-primary);
+  border-radius: 53px;
+  padding: 2px;
+  transition: border-color 0.15s ease;
+}
+
+.nav-search-box:focus-within {
+  border-color: var(--uds-foreground-brand);
+}
+
+.nav-search-inner {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  padding: 2px 8px 2px 20px;
+  gap: var(--uds-space-xs);
+}
+
+.nav-search-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.nav-search-inner input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body2-size);
+  font-weight: var(--uds-text-body2-weight);
+  line-height: var(--uds-text-body2-line-height);
+  color: var(--uds-foreground-primary);
+  background: transparent;
+}
+
+.nav-search-inner input::placeholder {
+  color: var(--uds-foreground-tertiary);
+}
+
+/* Search end icons group */
+.nav-search-icons {
+  display: flex;
+  align-items: center;
+  gap: var(--uds-space-xs);
+}
+
+.nav-search-divider {
+  display: flex;
+  align-items: center;
+  padding: 0 3.5px;
+}
+
+.nav-search-divider::after {
+  content: '';
+  display: block;
+  width: var(--uds-border-thin);
+  height: var(--uds-space-md);
+  background: #d7d7d7;
+}
+
+/* Icon buttons – 36px touch target in search, 32px in nav */
+.nav-icon-btn {
+  width: 36px;
+  height: 36px;
+  padding: 10px;
+  border: none;
+  border-radius: var(--uds-radius-full);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+  color: var(--uds-foreground-primary);
+}
+
+.nav-icon-btn:hover {
+  background: var(--uds-background-secondary);
+}
+
+.nav-icon-btn img,
+.nav-icon-btn svg {
+  width: var(--uds-space-md);
+  height: var(--uds-space-md);
+}
+
+/* Scout icon in search box */
+.nav-scout-btn {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  border: none;
+  border-radius: var(--uds-radius-full);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-scout-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Right nav icons */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--uds-space-lg);
+}
+
+.nav-actions .nav-icon-btn {
+  width: var(--uds-space-xl);
+  height: var(--uds-space-xl);
+  padding: 10px;
+}
+
+/* Tab bar – Figma: indented 100px (past logo), pill tabs */
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--uds-space-2xs);
+  margin-left: -20px;
+  overflow-x: auto;
+}
+
+/* Pill tab – Figma: headline1, 14px, medium, pill shape */
+.nav-tab {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body2-size);
+  font-weight: var(--uds-text-ui2-weight);
+  line-height: 17px;
+  letter-spacing: 0.21px;
+  color: var(--uds-foreground-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 2px var(--uds-space-sm);
+  border-radius: var(--uds-radius-full);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nav-tab:hover {
+  background: var(--uds-line-tertiary);
+  color: var(--uds-foreground-primary);
+}
+
+/* Selected tab – purple pill */
+.nav-tab.is-selected {
+  background: var(--uds-spectrum-purple-1);
+  color: var(--uds-foreground-primary);
+}
+
+/* Yahoo Scout link in tab bar */
+.nav-scout-link {
+  display: flex;
+  align-items: center;
+  gap: var(--uds-space-2xs);
+  text-decoration: none;
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body2-size);
+  font-weight: var(--uds-text-ui2-weight);
+  line-height: 17px;
+  letter-spacing: 0.21px;
+  color: var(--uds-foreground-secondary);
+  white-space: nowrap;
+  height: 24px;
+  padding: 0 var(--uds-space-sm);
+}
+
+.nav-scout-link img {
+  height: 16px;
+  width: 16px;
+}
+
+/* Anytime dropdown in tab bar */
+.nav-tab-dropdown {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body2-size);
+  font-weight: var(--uds-text-ui2-weight);
+  line-height: 17px;
+  letter-spacing: 0.21px;
+  color: var(--uds-foreground-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--uds-space-2xs);
+  white-space: nowrap;
+  height: 24px;
+  padding: 2px var(--uds-space-sm);
+  border-radius: var(--uds-radius-full);
+  margin-left: auto;
+}
+
+.nav-tab-dropdown:hover {
+  background: var(--uds-line-tertiary);
+}
+
+.nav-tab-dropdown svg {
+  width: var(--uds-space-sm);
+  height: var(--uds-space-sm);
+}

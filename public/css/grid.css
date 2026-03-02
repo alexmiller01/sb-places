@@ -1,0 +1,14 @@
+/**
+ * 1146px content grid – centered, UDS spacing
+ */
+body {
+  margin: 0;
+}
+
+.grid {
+  max-width: 1146px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--uds-space-lg);
+  padding-right: var(--uds-space-lg);
+}

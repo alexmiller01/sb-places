@@ -1,0 +1,35 @@
+/**
+ * UDS font-face declarations – Yahoo Product Sans
+ * Font alias: --uds-font-sans
+ */
+@font-face {
+  font-family: 'Yahoo Product Sans';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/YahooProductSans_normal_normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Yahoo Product Sans';
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/YahooProductSansMedium_normal_normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Yahoo Product Sans';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/YahooProductSansBold_normal_normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Yahoo Product Sans';
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/YahooProductSansVF_normal_normal.woff2') format('woff2-variations');
+}

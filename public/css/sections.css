@@ -1,0 +1,344 @@
+/**
+ * Content sections – UDS tokens for typography and colors
+ */
+
+/* Section titles – UDS headline1 */
+.places-section-title {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-headline1-size);
+  font-weight: var(--uds-text-headline1-weight);
+  line-height: var(--uds-text-headline1-line-height);
+  color: var(--uds-foreground-primary);
+  margin: 0 0 var(--uds-space-md) 0;
+}
+
+/* Overview block */
+.places-overview-title {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-title3-size);
+  font-weight: var(--uds-text-title3-weight);
+  line-height: var(--uds-text-title3-line-height);
+  color: var(--uds-foreground-primary);
+  margin: 0 0 var(--uds-space-sm) 0;
+}
+
+.places-overview {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 0;
+  transition: max-height 0.3s ease;
+  overflow: hidden;
+}
+
+.places-overview.is-expanded {
+  max-height: none;
+}
+
+/* About text – UDS body1 */
+.places-about-text {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body1-size);
+  font-weight: var(--uds-text-body1-weight);
+  line-height: var(--uds-text-body1-line-height);
+  color: var(--uds-foreground-primary);
+  margin: 0;
+}
+
+.places-about-text a {
+  color: var(--uds-foreground-accent);
+  text-decoration: none;
+}
+
+.places-about-text a:hover {
+  text-decoration: underline;
+}
+
+/* Facts list – UDS body2 */
+.places-facts-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--uds-space-xs);
+}
+
+.places-facts-list li {
+  display: flex;
+  gap: var(--uds-space-md);
+}
+
+.places-facts-label {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body2-size);
+  font-weight: var(--uds-text-ui2-weight);
+  line-height: var(--uds-text-body2-line-height);
+  color: var(--uds-foreground-secondary);
+  min-width: 100px;
+}
+
+.places-facts-value {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body2-size);
+  font-weight: var(--uds-text-body2-weight);
+  line-height: var(--uds-text-body2-line-height);
+  color: var(--uds-foreground-primary);
+}
+
+/* ── Quick Facts – Figma 981:9937 ── */
+.quick-facts {
+  background: var(--uds-background-primary);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--uds-space-md);
+}
+
+/* Module header – UDS title3 */
+.quick-facts-title {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-title3-size);
+  font-weight: var(--uds-text-title3-weight);
+  line-height: var(--uds-text-title3-line-height);
+  color: var(--uds-foreground-primary);
+  margin: 0;
+  min-height: 24px;
+}
+
+.quick-facts-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uds-space-sm);
+}
+
+/* Knowledge row – wrapping, 4px gap */
+.quick-facts-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--uds-space-2xs);
+}
+
+/* Label – UDS headline1: 14px, medium, primary fg */
+.quick-facts-label {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body1-size);
+  font-weight: var(--uds-text-ui2-weight);
+  line-height: var(--uds-text-body1-line-height);
+  color: var(--uds-foreground-primary);
+  white-space: nowrap;
+}
+
+/* Value – UDS body1: 14px, regular, secondary fg */
+.quick-facts-value {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body1-size);
+  font-weight: var(--uds-text-body1-weight);
+  line-height: var(--uds-text-body1-line-height);
+  color: var(--uds-foreground-secondary);
+}
+
+/* ── More Flights – Figma 981:9938 ── */
+.more-flights {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uds-space-sm);
+}
+
+.more-flights-title {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-title3-size);
+  font-weight: var(--uds-text-title3-weight);
+  line-height: var(--uds-text-title3-line-height);
+  color: var(--uds-foreground-primary);
+  margin: 0;
+}
+
+.more-flights-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.more-flights-row {
+  display: flex;
+  align-items: center;
+  gap: var(--uds-space-2xs);
+  padding: var(--uds-space-sm) 0;
+  border-top: var(--uds-border-thin) solid var(--uds-line-tertiary);
+  border-bottom: var(--uds-border-thin) solid var(--uds-line-tertiary);
+}
+
+.more-flights-row + .more-flights-row {
+  border-top: none;
+}
+
+.more-flights-airline {
+  display: flex;
+  align-items: center;
+  gap: var(--uds-space-2xs);
+  flex: 1;
+  min-width: 0;
+}
+
+.more-flights-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--uds-radius-full);
+  background: var(--uds-background-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.more-flights-icon svg,
+.more-flights-icon img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.more-flights-name {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body1-size);
+  font-weight: var(--uds-text-ui2-weight);
+  line-height: var(--uds-text-body1-line-height);
+  color: var(--uds-foreground-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.more-flights-details {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-width: 160px;
+  justify-content: space-between;
+}
+
+.more-flights-stops {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body2-size);
+  font-weight: var(--uds-text-body2-weight);
+  line-height: 21px;
+  color: var(--uds-foreground-primary);
+  text-align: left;
+}
+
+.more-flights-price {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body1-size);
+  font-weight: var(--uds-text-ui2-weight);
+  line-height: var(--uds-text-body1-line-height);
+  color: var(--uds-foreground-primary);
+  text-align: right;
+}
+
+.more-flights-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--uds-space-xs) var(--uds-space-sm);
+  border: none;
+  border-radius: var(--uds-radius-full);
+  background: var(--uds-spectrum-carbon-2);
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body2-size);
+  font-weight: var(--uds-text-ui2-weight);
+  line-height: 15.4px;
+  color: var(--uds-foreground-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  align-self: flex-start;
+}
+
+.more-flights-btn:hover {
+  background: var(--uds-line-secondary);
+}
+
+.more-flights-btn svg {
+  width: var(--uds-space-md);
+  height: var(--uds-space-md);
+}
+
+/* ── Related searches – Figma 981:9971 ── */
+.related-searches {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uds-space-md);
+}
+
+.related-searches-title {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-title3-size);
+  font-weight: var(--uds-text-title3-weight);
+  line-height: var(--uds-text-title3-line-height);
+  color: var(--uds-foreground-primary);
+  margin: 0;
+}
+
+.related-searches-row {
+  display: flex;
+  gap: var(--uds-space-md);
+  overflow: hidden;
+  position: relative;
+}
+
+.related-tile {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--uds-space-xs);
+  align-items: flex-start;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.related-tile-image {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--uds-radius-xl);
+  overflow: hidden;
+  background: #f5f8fa;
+}
+
+.related-tile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.related-tile:hover .related-tile-image img {
+  transform: scale(1.1);
+}
+
+.related-tile-label {
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-body2-size);
+  font-weight: var(--uds-text-body2-weight);
+  line-height: var(--uds-text-label3-line-height);
+  color: var(--uds-foreground-primary);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 96px;
+}
+
+/* Videos grid */
+.places-videos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--uds-space-md);
+}
+
+@media (max-width: 1100px) {
+  .places-videos-grid {
+    grid-template-columns: 1fr;
+  }
+}

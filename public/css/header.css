@@ -1,0 +1,9 @@
+/**
+ * Header – UDS tokens
+ * Max-width: 1146px
+ */
+.places-header {
+  max-width: 1146px;
+  margin: 0 auto;
+  padding: 0 var(--uds-space-lg);
+}

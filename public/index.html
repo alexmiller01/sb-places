@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>places-supertop</title>
+  <link rel="preload" href="/fonts/YahooProductSans_normal_normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/css/fonts.css" />
+  <link rel="stylesheet" href="/css/grid.css" />
+  <link rel="stylesheet" href="/css/nav.css" />
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/supertop.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/sections.css" />
+  <link rel="stylesheet" href="/css/cards.css" />
+  <style>
+    .password-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: url('/assets/ripley.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    .password-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .password-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 48px;
+      width: 100%;
+      max-width: 420px;
+      margin: 16px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+    @media (max-width: 480px) {
+      .password-container { padding: 32px 24px; border-radius: 20px; }
+    }
+    .password-logo {
+      width: 144px;
+      height: 40px;
+      object-fit: contain;
+      margin-bottom: 24px;
+    }
+    .password-title {
+      font-family: var(--uds-font-sans);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--uds-foreground-primary);
+      margin-bottom: 8px;
+    }
+    .password-subtitle {
+      font-family: var(--uds-font-sans);
+      font-size: 14px;
+      color: var(--uds-foreground-secondary);
+      margin-bottom: 32px;
+    }
+    .password-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .password-input-wrapper {
+      position: relative;
+    }
+    .password-input {
+      width: 100%;
+      padding: 16px 48px 16px 20px;
+      font-family: var(--uds-font-sans);
+      font-size: 16px;
+      border: 2px solid var(--uds-line-primary);
+      border-radius: 12px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .password-input:focus {
+      border-color: var(--uds-foreground-brand);
+      box-shadow: 0 0 0 4px rgba(96, 1, 210, 0.12);
+    }
+    .password-input.error {
+      border-color: #e53935;
+      animation: pw-shake 0.4s ease;
+    }
+    @keyframes pw-shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--uds-foreground-tertiary);
+      padding: 4px;
+    }
+    .password-toggle:hover { color: var(--uds-foreground-primary); }
+    .password-submit {
+      padding: 16px 24px;
+      background: var(--uds-foreground-brand);
+      color: var(--uds-foreground-on-color);
+      font-family: var(--uds-font-sans);
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+    .password-submit:hover { background: #4c01a6; }
+    .password-submit:active { transform: scale(0.98); }
+    .password-error-msg {
+      color: #e53935;
+      font-family: var(--uds-font-sans);
+      font-size: 13px;
+      min-height: 20px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .password-error-msg.visible { opacity: 1; }
+    .protected-content { display: none; }
+    .protected-content.unlocked { display: block; }
+  </style>
+</head>
+<body>
+  <!-- Password Protection Overlay -->
+  <div id="passwordOverlay" class="password-overlay">
+    <div class="password-container">
+      <img src="/assets/Y%21Logos%20Main.svg" alt="Yahoo" class="password-logo">
+      <h1 class="password-title">Protected Prototype</h1>
+      <p class="password-subtitle">Enter password to continue</p>
+      <form id="passwordForm" class="password-form" autocomplete="off">
+        <div class="password-input-wrapper">
+          <input type="password" id="passwordInput" class="password-input" placeholder="Enter password" autocomplete="new-password" spellcheck="false">
+          <button type="button" id="togglePassword" class="password-toggle" tabindex="-1">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <p id="errorMsg" class="password-error-msg"></p>
+        <button type="submit" class="password-submit">Access Prototype</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="protectedContent" class="protected-content">
+  <header class="nav-header">
+    <div class="nav-inner">
+      <div class="nav-top">
+        <div class="nav-front">
+          <a href="/" class="nav-logo" aria-label="Yahoo">
+<img src="/assets/Y%21Logos%20Main.svg" alt="Yahoo" width="86" height="24" />
+          </a>
+          <div class="nav-search-wrap">
+            <div class="nav-search-box">
+              <div class="nav-search-inner">
+                <input type="search" id="search-input" placeholder="Chicago, IL" autocomplete="off" aria-label="Search" />
+                <div class="nav-search-icons">
+                  <button type="button" class="nav-icon-btn" aria-label="Clear">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  </button>
+                  <button type="button" class="nav-icon-btn" aria-label="Voice search">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="5.5" y="1" width="5" height="9" rx="2.5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M3 8a5 5 0 0010 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><line x1="8" y1="13" x2="8" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  </button>
+                  <button type="button" class="nav-icon-btn" aria-label="Search">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5"/><line x1="11" y1="11" x2="14" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  </button>
+                  <span class="nav-search-divider" aria-hidden="true"></span>
+                  <button type="button" class="nav-scout-btn" aria-label="Scout">
+                    <img src="/assets/yahooscout.svg" alt="" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="nav-actions">
+          <button type="button" class="nav-icon-btn" aria-label="App launcher">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="4" height="4" rx="1" fill="currentColor"/><rect x="6" y="1" width="4" height="4" rx="1" fill="currentColor"/><rect x="11" y="1" width="4" height="4" rx="1" fill="currentColor"/><rect x="1" y="6" width="4" height="4" rx="1" fill="currentColor"/><rect x="6" y="6" width="4" height="4" rx="1" fill="currentColor"/><rect x="11" y="6" width="4" height="4" rx="1" fill="currentColor"/><rect x="1" y="11" width="4" height="4" rx="1" fill="currentColor"/><rect x="6" y="11" width="4" height="4" rx="1" fill="currentColor"/><rect x="11" y="11" width="4" height="4" rx="1" fill="currentColor"/></svg>
+          </button>
+          <button type="button" class="nav-icon-btn" aria-label="Inbox">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M2 4l6 5 6-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="nav-tabs">
+        <a href="#" class="nav-scout-link">
+          <img src="/assets/yahooscout.svg" alt="" />
+          <span>Yahoo Scout</span>
+        </a>
+        <a href="#" class="nav-tab is-selected">All</a>
+        <a href="#" class="nav-tab">Images</a>
+        <a href="#" class="nav-tab">Videos</a>
+        <a href="#" class="nav-tab">News</a>
+        <a href="#" class="nav-tab">Local</a>
+        <button type="button" class="nav-tab-dropdown" aria-haspopup="listbox">
+          Anytime
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main class="grid">
+    <section class="supertop" aria-labelledby="location-title">
+      <div class="supertop-header">
+        <h1 id="location-title" class="supertop-title">Chicago, IL</h1>
+        <p id="location-subtitle" class="supertop-subtitle">Third-largest city in the United States</p>
+      </div>
+      <div class="supertop-bricks">
+        <div class="supertop-gallery" onclick="openImageOverlay()" style="cursor: pointer;">
+          <div class="supertop-gallery-main">
+            <img id="gallery-main" src="https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=800&h=600&fit=crop" alt="" />
+          </div>
+          <div class="supertop-gallery-side">
+            <div class="thumb">
+              <img id="gallery-thumb1" src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=400&h=300&fit=crop" alt="" />
+            </div>
+            <div class="thumb">
+              <img id="gallery-thumb2" src="https://images.unsplash.com/photo-1581373449483-37449f962b6c?w=300&h=300&fit=crop" alt="" />
+              <button type="button" class="supertop-gallery-more" aria-label="More images" onclick="openImageOverlay()">
+                <img src="/assets/images.svg" alt="" width="16" height="16" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="supertop-map">
+          <div class="supertop-map-inner">
+            <div id="supertop-here-map" class="supertop-map-container" aria-label="Map of Chicago"></div>
+            <button type="button" class="supertop-map-search-area" id="mapSearchArea">Search this area</button>
+            <div class="supertop-map-controls">
+              <button type="button" class="supertop-map-ctrl" id="mapZoomIn" aria-label="Zoom in">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+              <button type="button" class="supertop-map-ctrl" id="mapZoomOut" aria-label="Zoom out">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+            <button type="button" class="supertop-map-expand" aria-label="Expand map" aria-expanded="false">
+              <img src="/assets/expand.svg" alt="" />
+            </button>
+          </div>
+        </div>
+        <div class="supertop-right">
+          <div class="supertop-card supertop-card-weather" onclick="window.open('https://weather.yahoo.com/us/il/chicago/','_blank')" style="cursor:pointer;">
+            <div class="supertop-card-header">
+              <h2 class="supertop-card-title">Weather</h2>
+              <img src="/assets/chevron.svg" alt="" class="supertop-chevron" aria-hidden="true" />
+            </div>
+            <div class="supertop-weather-row">
+              <div class="supertop-weather-day">
+                <span class="supertop-weather-day-label">Today</span>
+                <img src="/assets/cloudy.svg" alt="" />
+                <div class="supertop-weather-temps">
+                  <span class="supertop-weather-high">38°</span>
+                  <span class="supertop-weather-low">24°</span>
+                </div>
+              </div>
+              <div class="supertop-weather-day">
+                <span class="supertop-weather-day-label">Tomorrow</span>
+                <img src="/assets/sunnywithcloud.svg" alt="" />
+                <div class="supertop-weather-temps">
+                  <span class="supertop-weather-high">42°</span>
+                  <span class="supertop-weather-low">28°</span>
+                </div>
+              </div>
+              <div class="supertop-weather-day">
+                <span class="supertop-weather-day-label">Friday</span>
+                <img src="/assets/rainy.svg" alt="" />
+                <div class="supertop-weather-temps">
+                  <span class="supertop-weather-high">35°</span>
+                  <span class="supertop-weather-low">22°</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="supertop-card supertop-card-flights" onclick="window.open('https://hopper.com/flights/shop/?adultsCount=1&childrenCount&departureDate=2026-03-25&destination=CHI&flightShopProgress=1&flightShopType=default&infantsInSeatCount&infantsOnLapCount&maxPrice=9007199254740991&noLCC=false&origin=NYC&returnDate=2026-04-13&stopsOption=ANY_NUMBER&tripCategory=round_trip','_blank')" style="cursor:pointer;">
+            <div class="supertop-card-header">
+              <h2 class="supertop-card-title">Check flights</h2>
+              <img src="/assets/chevron.svg" alt="" class="supertop-chevron" aria-hidden="true" />
+            </div>
+            <div class="supertop-flights-price">
+              <img src="/assets/plane.svg" alt="" />
+              <span id="flights-price" class="supertop-flights-amount">$127</span>
+            </div>
+            <p id="flights-detail" class="supertop-flights-detail">2h 15m from New York NY</p>
+          </div>
+        </div>
+      </div>
+      <hr class="supertop-divider" />
+    </section>
+
+    <div class="places-main">
+      <div class="places-main-left">
+        <section>
+          <div id="places-results-list">
+
+            <div class="algo">
+              <div class="algo-source">
+                <div class="algo-favicon"><img src="https://www.google.com/s2/favicons?domain=wikipedia.org&sz=32" alt="" width="16" height="16" /></div>
+                <span><span class="algo-source-name">Wikipedia</span><span class="algo-source-url"> › en.wikipedia.org › wiki › Chicago</span></span>
+              </div>
+              <h3 class="algo-title"><a href="https://en.wikipedia.org/wiki/Chicago">Chicago - Wikipedia</a></h3>
+              <p class="algo-snippet"><b>Chicago</b> is the most populous city in the U.S. state of <b>Illinois</b> and in the Midwestern United States. With a population of 2,665,039, it is the third-most populous city in the United States after New York City and Los Angeles.</p>
+              <div class="algo-quicklinks">
+                <ul>
+                  <li><a href="https://en.wikipedia.org/wiki/Willis_Tower">Willis Tower</a><p><span>Willis Tower (formerly Sears Tower) is a 110-story, 1,451-foot skyscraper in the Loop community area of Chicago...</span></p></li>
+                  <li><a href="https://en.wikipedia.org/wiki/Millennium_Park">Millennium Park</a><p><span>Millennium Park is a public park located in the Loop community area of Chicago. It is bounded by Michigan Avenue to the west...</span></p></li>
+                  <li><a href="https://en.wikipedia.org/wiki/Navy_Pier">Navy Pier</a><p><span>Navy Pier is a 3,300-foot-long pier on the shoreline of Lake Michigan in the Streeterville neighborhood of Chicago...</span></p></li>
+                </ul>
+                <ul>
+                  <li><a href="https://en.wikipedia.org/wiki/Cloud_Gate">Cloud Gate (The Bean)</a><p><span>Cloud Gate is a public sculpture by Indian-born British artist Sir Anish Kapoor, located in Millennium Park in Chicago...</span></p></li>
+                  <li><a href="https://en.wikipedia.org/wiki/Art_Institute_of_Chicago">Art Institute of Chicago</a><p><span>The Art Institute of Chicago is an encyclopedic art museum and one of the oldest and largest art museums in the United States...</span></p></li>
+                  <li><a href="https://en.wikipedia.org/wiki/Wrigley_Field">Wrigley Field</a><p><span>Wrigley Field is a baseball park located on the North Side of Chicago, home of the Chicago Cubs since 1916...</span></p></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="things-to-do">
+              <h2 class="things-to-do-title">Things to do in Chicago, IL</h2>
+              <div class="things-to-do-row">
+                <div class="ttd-card">
+                  <img class="ttd-card-image" src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=400&h=224&fit=crop" alt="" />
+                  <div class="ttd-card-rating">
+                    <img class="ttd-card-rating-logo" src="https://www.google.com/s2/favicons?domain=tripadvisor.com&sz=32" alt="" />
+                    <span class="ttd-card-rating-text"><strong>4.9</strong> (6.5K) TripAdvisor</span>
+                  </div>
+                  <div class="ttd-card-name">Chicago Architecture Boat Tour on the River</div>
+                  <div class="ttd-card-meta">
+                    <div class="ttd-card-meta-row">
+                      <img class="ttd-card-meta-icon" src="/assets/location-sm.svg" alt="" />
+                      <span class="ttd-card-meta-text">Chicago, IL</span>
+                    </div>
+                    <div class="ttd-card-meta-row">
+                      <img class="ttd-card-meta-icon" src="/assets/cancel.svg" alt="" />
+                      <span class="ttd-card-meta-text">Free cancellation</span>
+                    </div>
+                  </div>
+                  <div class="ttd-card-price">from $47.00</div>
+                  <button class="ttd-card-btn" type="button" onclick="window.open('https://www.architecture.org/tours','_blank')">Book now</button>
+                </div>
+                <div class="ttd-card">
+                  <img class="ttd-card-image" src="https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=400&h=224&fit=crop" alt="" />
+                  <div class="ttd-card-rating">
+                    <img class="ttd-card-rating-logo" src="https://www.google.com/s2/favicons?domain=tripadvisor.com&sz=32" alt="" />
+                    <span class="ttd-card-rating-text"><strong>4.6</strong> (8.2K) TripAdvisor</span>
+                  </div>
+                  <div class="ttd-card-name">Willis Tower Skydeck & The Ledge Experience</div>
+                  <div class="ttd-card-meta">
+                    <div class="ttd-card-meta-row">
+                      <img class="ttd-card-meta-icon" src="/assets/location-sm.svg" alt="" />
+                      <span class="ttd-card-meta-text">Chicago, IL</span>
+                    </div>
+                    <div class="ttd-card-meta-row">
+                      <img class="ttd-card-meta-icon" src="/assets/cancel.svg" alt="" />
+                      <span class="ttd-card-meta-text">Free cancellation</span>
+                    </div>
+                  </div>
+                  <div class="ttd-card-price">from $32.00</div>
+                  <button class="ttd-card-btn" type="button" onclick="window.open('https://www.willistower.com/skydeck/buy-tickets','_blank')">Book now</button>
+                </div>
+                <div class="ttd-card">
+                  <img class="ttd-card-image" src="https://images.unsplash.com/photo-1581373449483-37449f962b6c?w=400&h=224&fit=crop" alt="" />
+                  <div class="ttd-card-rating">
+                    <img class="ttd-card-rating-logo" src="https://www.google.com/s2/favicons?domain=tripadvisor.com&sz=32" alt="" />
+                    <span class="ttd-card-rating-text"><strong>4.9</strong> (15.1K) TripAdvisor</span>
+                  </div>
+                  <div class="ttd-card-name">Art Institute of Chicago General Admission</div>
+                  <div class="ttd-card-meta">
+                    <div class="ttd-card-meta-row">
+                      <img class="ttd-card-meta-icon" src="/assets/location-sm.svg" alt="" />
+                      <span class="ttd-card-meta-text">Chicago, IL</span>
+                    </div>
+                    <div class="ttd-card-meta-row">
+                      <img class="ttd-card-meta-icon" src="/assets/cancel.svg" alt="" />
+                      <span class="ttd-card-meta-text">Free cancellation</span>
+                    </div>
+                  </div>
+                  <div class="ttd-card-price">from $25.00</div>
+                  <button class="ttd-card-btn" type="button" onclick="window.open('https://sales.artic.edu/admissions','_blank')">Book now</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="algo">
+              <div class="algo-source">
+                <div class="algo-favicon"><img src="https://www.google.com/s2/favicons?domain=choosechicago.com&sz=32" alt="" width="16" height="16" /></div>
+                <span><span class="algo-source-name">Choose Chicago</span><span class="algo-source-url"> › choosechicago.com › things-to-do</span></span>
+              </div>
+              <h3 class="algo-title"><a href="https://www.choosechicago.com/things-to-do/">Things to Do in Chicago | Choose Chicago</a></h3>
+              <p class="algo-snippet">Explore the best things to do in <b>Chicago</b>. From world-class museums and iconic architecture to deep-dish pizza and lakefront activities, find your perfect <b>Chicago</b> experience.</p>
+            </div>
+
+            <div class="algo">
+              <div class="algo-source">
+                <div class="algo-favicon"><img src="https://www.google.com/s2/favicons?domain=tripadvisor.com&sz=32" alt="" width="16" height="16" /></div>
+                <span><span class="algo-source-name">TripAdvisor</span><span class="algo-source-url"> › tripadvisor.com › Tourism-Chicago</span></span>
+              </div>
+              <h3 class="algo-title"><a href="https://www.tripadvisor.com/Tourism-g35805-Chicago_Illinois-Vacations.html">Chicago 2026: Best of Chicago Tourism - Tripadvisor</a></h3>
+              <p class="algo-snippet">Plan your trip to <b>Chicago</b> with reviews and advice from real travelers. Find the best hotels, restaurants, and things to do in the Windy City.</p>
+            </div>
+
+            <div class="algo">
+              <div class="algo-source">
+                <div class="algo-favicon"><img src="https://www.google.com/s2/favicons?domain=timeout.com&sz=32" alt="" width="16" height="16" /></div>
+                <span><span class="algo-source-name">Time Out</span><span class="algo-source-url"> › timeout.com › chicago › things-to-do</span></span>
+              </div>
+              <h3 class="algo-title"><a href="https://www.timeout.com/chicago/things-to-do/best-things-to-do-in-chicago">Best Things to Do in Chicago Right Now - Time Out</a></h3>
+              <p class="algo-snippet">The best things to do in <b>Chicago</b> include visiting Millennium Park, taking an architecture boat tour, eating deep-dish pizza, and exploring the vibrant neighborhoods.</p>
+            </div>
+
+            <div class="algo">
+              <div class="algo-source">
+                <div class="algo-favicon"><img src="https://www.google.com/s2/favicons?domain=lonelyplanet.com&sz=32" alt="" width="16" height="16" /></div>
+                <span><span class="algo-source-name">Lonely Planet</span><span class="algo-source-url"> › lonelyplanet.com › usa › chicago</span></span>
+              </div>
+              <h3 class="algo-title"><a href="https://www.lonelyplanet.com/usa/chicago">Chicago Travel Guide - Lonely Planet</a></h3>
+              <p class="algo-snippet"><b>Chicago</b> is a real-life architecture museum, blues and jazz capital, and home to some of the best food in the country. The lakefront setting only adds to the appeal.</p>
+            </div>
+
+            <div class="algo">
+              <div class="algo-source">
+                <div class="algo-favicon"><img src="https://www.google.com/s2/favicons?domain=cnn.com&sz=32" alt="" width="16" height="16" /></div>
+                <span><span class="algo-source-name">CNN Travel</span><span class="algo-source-url"> › cnn.com › travel › chicago-best-things-to-do</span></span>
+              </div>
+              <h3 class="algo-title"><a href="https://www.cnn.com/travel/article/things-to-do-chicago/index.html">Chicago: 15 Best Things to Do - CNN Travel</a></h3>
+              <p class="algo-snippet">From the Art Institute to Wrigley Field, from deep-dish pizza to the Riverwalk — here are the best things to do in <b>Chicago</b>, one of America's greatest cities.</p>
+            </div>
+
+            <div class="algo">
+              <div class="algo-source">
+                <div class="algo-favicon"><img src="https://www.google.com/s2/favicons?domain=theguardian.com&sz=32" alt="" width="16" height="16" /></div>
+                <span><span class="algo-source-name">The Guardian</span><span class="algo-source-url"> › theguardian.com › travel › chicago</span></span>
+              </div>
+              <h3 class="algo-title"><a href="https://www.theguardian.com/travel/chicago">Chicago City Guide: The Best Bars, Restaurants and Things to Do</a></h3>
+              <p class="algo-snippet">A local's guide to <b>Chicago</b>, from the best deep-dish spots to hidden speakeasies and the neighborhoods you need to explore beyond the Loop.</p>
+            </div>
+
+            <div class="algo">
+              <div class="algo-source">
+                <div class="algo-favicon"><img src="https://www.google.com/s2/favicons?domain=cntraveler.com&sz=32" alt="" width="16" height="16" /></div>
+                <span><span class="algo-source-name">Condé Nast Traveler</span><span class="algo-source-url"> › cntraveler.com › story › chicago-travel-guide</span></span>
+              </div>
+              <h3 class="algo-title"><a href="https://www.cntraveler.com/story/chicago-travel-guide">The Ultimate Chicago Travel Guide - Condé Nast Traveler</a></h3>
+              <p class="algo-snippet">Where to eat, stay, and explore in <b>Chicago</b>. Our editors' picks for the best hotels, restaurants, and experiences across the Windy City.</p>
+            </div>
+
+            <div class="algo">
+              <div class="algo-source">
+                <div class="algo-favicon"><img src="https://www.google.com/s2/favicons?domain=architecture.org&sz=32" alt="" width="16" height="16" /></div>
+                <span><span class="algo-source-name">Chicago Architecture Center</span><span class="algo-source-url"> › architecture.org › tours</span></span>
+              </div>
+              <h3 class="algo-title"><a href="https://www.architecture.org/tours">Chicago Architecture Boat Tours - Chicago Architecture Center</a></h3>
+              <p class="algo-snippet">Experience <b>Chicago</b>'s world-renowned architecture from the river. The Chicago Architecture Center offers guided boat tours past over 50 buildings along the <b>Chicago</b> River.</p>
+            </div>
+
+            <div class="algo">
+              <div class="algo-source">
+                <div class="algo-favicon"><img src="https://www.google.com/s2/favicons?domain=chicagotribune.com&sz=32" alt="" width="16" height="16" /></div>
+                <span><span class="algo-source-name">Chicago Tribune</span><span class="algo-source-url"> › chicagotribune.com › travel › visitors-guide</span></span>
+              </div>
+              <h3 class="algo-title"><a href="https://www.chicagotribune.com/travel/visitors-guide/">Chicago Visitor's Guide - Chicago Tribune</a></h3>
+              <p class="algo-snippet">Everything you need to plan your visit to <b>Chicago</b>: where to eat, what to see, how to get around, and the best events happening in the city right now.</p>
+            </div>
+
+          </div>
+        </section>
+      </div>
+
+      <aside class="places-sidebar">
+        <div class="places-overview" id="overview-block" tabindex="0" role="button" aria-expanded="false">
+          <h2 id="overview-title" class="places-overview-title">More about Chicago, IL</h2>
+          <div class="places-overview-content">
+            <p id="about-text" class="places-about-text">Chicago is the most populous city in Illinois and the third-most populous in the United States. Known as the "Windy City," it sits on the southwestern shore of Lake Michigan and is renowned for its bold architecture, deep-dish pizza, blues music, and vibrant cultural scene.</p>
+          </div>
+        </div>
+
+        <div class="quick-facts">
+          <h2 class="quick-facts-title">Quick facts</h2>
+          <div class="quick-facts-content">
+            <div class="quick-facts-row">
+              <span class="quick-facts-label">Population:</span>
+              <span class="quick-facts-value">2.66 million (2023),</span>
+              <span class="quick-facts-value">Metro area: 9.4 million</span>
+            </div>
+            <div class="quick-facts-row">
+              <span class="quick-facts-label">Area:</span>
+              <span class="quick-facts-value">606 km² (234 sq mi)</span>
+            </div>
+            <div class="quick-facts-row">
+              <span class="quick-facts-label">State:</span>
+              <span class="quick-facts-value">Illinois</span>
+            </div>
+            <div class="quick-facts-row">
+              <span class="quick-facts-label">Nicknames:</span>
+              <span class="quick-facts-value">The Windy City,</span>
+              <span class="quick-facts-value">Chi-Town,</span>
+              <span class="quick-facts-value">Second City</span>
+            </div>
+            <div class="quick-facts-row">
+              <span class="quick-facts-label">Time zone:</span>
+              <span class="quick-facts-value">CST (UTC−6)</span>
+            </div>
+            <div class="quick-facts-row">
+              <span class="quick-facts-label">Climate:</span>
+              <span class="quick-facts-value">Humid continental,</span>
+              <span class="quick-facts-value">avg. summer 84°F (29°C),</span>
+              <span class="quick-facts-value">avg. winter 26°F (−3°C)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="more-flights">
+          <h2 class="more-flights-title">More flights</h2>
+          <div class="more-flights-list">
+            <div class="more-flights-row">
+              <div class="more-flights-airline">
+                <div class="more-flights-icon">
+                  <img src="https://www.google.com/s2/favicons?domain=united.com&sz=32" alt="United" width="16" height="16" />
+                </div>
+                <span class="more-flights-name">United Airlines</span>
+              </div>
+              <div class="more-flights-details">
+                <span class="more-flights-stops">Nonstop</span>
+                <span class="more-flights-price">$127</span>
+              </div>
+            </div>
+            <div class="more-flights-row">
+              <div class="more-flights-airline">
+                <div class="more-flights-icon">
+                  <img src="https://www.google.com/s2/favicons?domain=aa.com&sz=32" alt="American" width="16" height="16" />
+                </div>
+                <span class="more-flights-name">American Airlines</span>
+              </div>
+              <div class="more-flights-details">
+                <span class="more-flights-stops">Nonstop</span>
+                <span class="more-flights-price">$139</span>
+              </div>
+            </div>
+            <div class="more-flights-row">
+              <div class="more-flights-airline">
+                <div class="more-flights-icon">
+                  <img src="https://www.google.com/s2/favicons?domain=delta.com&sz=32" alt="Delta" width="16" height="16" />
+                </div>
+                <span class="more-flights-name">Delta Air Lines</span>
+              </div>
+              <div class="more-flights-details">
+                <span class="more-flights-stops">Nonstop</span>
+                <span class="more-flights-price">$152</span>
+              </div>
+            </div>
+            <div class="more-flights-row">
+              <div class="more-flights-airline">
+                <div class="more-flights-icon">
+                  <img src="https://www.google.com/s2/favicons?domain=spirit.com&sz=32" alt="Spirit" width="16" height="16" />
+                </div>
+                <span class="more-flights-name">Spirit Airlines</span>
+              </div>
+              <div class="more-flights-details">
+                <span class="more-flights-stops">Nonstop</span>
+                <span class="more-flights-price">$89</span>
+              </div>
+            </div>
+          </div>
+          <button class="more-flights-btn" type="button" onclick="window.open('https://hopper.com/flights/shop/?adultsCount=1&childrenCount&departureDate=2026-03-25&destination=CHI&flightShopProgress=1&flightShopType=default&infantsInSeatCount&infantsOnLapCount&maxPrice=9007199254740991&noLCC=false&origin=NYC&returnDate=2026-04-13&stopsOption=ANY_NUMBER&tripCategory=round_trip','_blank')">
+            Get more flights
+            <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <div class="related-searches">
+          <h2 class="related-searches-title">People also search for</h2>
+          <div class="related-searches-row">
+            <a class="related-tile" href="https://search.yahoo.com/search?p=Milwaukee+WI">
+              <div class="related-tile-image">
+                <img src="https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=200&h=200&fit=crop" alt="" />
+              </div>
+              <span class="related-tile-label">Milwaukee, WI</span>
+            </a>
+            <a class="related-tile" href="https://search.yahoo.com/search?p=Indianapolis+IN">
+              <div class="related-tile-image">
+                <img src="https://images.unsplash.com/photo-1570475735025-6cd1cd5c779d?w=200&h=200&fit=crop" alt="" />
+              </div>
+              <span class="related-tile-label">Indianapolis, IN</span>
+            </a>
+            <a class="related-tile" href="https://search.yahoo.com/search?p=Detroit+MI">
+              <div class="related-tile-image">
+                <img src="https://images.unsplash.com/photo-1534430480872-3498386e7856?w=200&h=200&fit=crop" alt="" />
+              </div>
+              <span class="related-tile-label">Detroit, MI</span>
+            </a>
+            <a class="related-tile" href="https://search.yahoo.com/search?p=St+Louis+MO">
+              <div class="related-tile-image">
+                <img src="https://images.unsplash.com/photo-1568515045052-f9a854d70bfd?w=200&h=200&fit=crop" alt="" />
+              </div>
+              <span class="related-tile-label">St. Louis, MO</span>
+            </a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="mapHoverBridge" class="map-hover-bridge"></div>
+  <div id="mapHoverCard" class="map-hover-card">
+    <div class="map-hover-card-gallery">
+      <img id="mapHoverCardImg1" src="" alt="" />
+      <img id="mapHoverCardImg2" src="" alt="" />
+    </div>
+    <div class="map-hover-card-body">
+      <div id="mapHoverCardName" class="map-hover-card-name"></div>
+      <div class="map-hover-card-rating">
+        <img src="/assets/Retail/Icon,%20Yelp.svg" alt="Yelp" class="map-hover-card-yelp" />
+        <span id="mapHoverCardScore" class="map-hover-card-score"></span>
+        <span id="mapHoverCardReviews" class="map-hover-card-distance"></span>
+        <span class="map-hover-card-distance">Yelp</span>
+        <span class="map-hover-card-dot">·</span>
+        <span id="mapHoverCardDistance" class="map-hover-card-distance"></span>
+      </div>
+      <div class="map-hover-card-hours">
+        <span id="mapHoverCardStatus" class="map-hover-card-status-open"></span>
+        <span class="map-hover-card-dot">·</span>
+        <span id="mapHoverCardHours" class="map-hover-card-hours-text"></span>
+      </div>
+      <div id="mapHoverCardCategory" class="map-hover-card-category"></div>
+    </div>
+    <div id="mapHoverCardActions" class="map-hover-card-actions" style="display:none;">
+      <button id="mapHoverCardBtn1" class="map-hover-card-btn" type="button">
+        <img id="mapHoverCardBtn1Icon" src="" alt="" />
+        <span id="mapHoverCardBtn1Text"></span>
+      </button>
+      <button id="mapHoverCardBtn2" class="map-hover-card-btn" type="button">
+        <img id="mapHoverCardBtn2Icon" src="" alt="" />
+        <span id="mapHoverCardBtn2Text"></span>
+      </button>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script src="https://js.api.here.com/v3/3.2/mapsjs-core.js"></script>
+  <script src="https://js.api.here.com/v3/3.2/mapsjs-service.js"></script>
+  <script src="https://js.api.here.com/v3/3.2/mapsjs-mapevents.js"></script>
+  <script src="https://js.api.here.com/v3/3.2/mapsjs-harp.js"></script>
+  <script>
+    (function() {
+      var apiKey = 'CJQ-lNVWhFhWMO8mTrCJ-SAPvK4Cv3dsfs3VqONzJpo';
+      var platform = new H.service.Platform({ apikey: apiKey });
+      var defaultLayers = platform.createDefaultLayers({
+        engineType: H.Map.EngineType.HARP,
+        lg: 'en'
+      });
+      var baseLayer = defaultLayers.vector.normal.map;
+      var styleUrl = 'https://raw.githubusercontent.com/alexmiller01/Yahoomultilisting/main/style/style.json';
+      var customStyle = new H.map.render.harp.Style(styleUrl);
+      if (customStyle) {
+        baseLayer.getProvider().setStyle(customStyle);
+      }
+      var mapContainer = document.getElementById('supertop-here-map');
+      var chicagoCenter = { lat: 41.8781, lng: -87.6298 };
+      var map = new H.Map(mapContainer, baseLayer, {
+        center: chicagoCenter,
+        zoom: 9,
+        pixelRatio: window.devicePixelRatio || 1,
+        engineType: H.Map.EngineType.HARP
+      });
+      window.addEventListener('resize', function() { map.getViewPort().resize(); });
+      new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+      var mapSearchAreaBtn = document.getElementById('mapSearchArea');
+      var mapExpandedCenter = null;
+
+      map.addEventListener('mapviewchangeend', function() {
+        if (!document.querySelector('.supertop-map').classList.contains('is-expanded')) return;
+        if (!mapExpandedCenter) return;
+        var currentCenter = map.getCenter();
+        var screenStart = map.geoToScreen(mapExpandedCenter);
+        var screenCurrent = map.geoToScreen(currentCenter);
+        if (screenStart && screenCurrent) {
+          var dx = Math.abs(screenStart.x - screenCurrent.x);
+          var dy = Math.abs(screenStart.y - screenCurrent.y);
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > 240) {
+            var bounds = map.getViewModel().getLookAtData().bounds;
+            var anyPinsVisible = false;
+            if (bounds) {
+              var bbox = bounds.getBoundingBox();
+              for (var i = 0; i < poiMarkers.length; i++) {
+                var g = poiMarkers[i].getGeometry();
+                if (g.lat >= bbox.getBottom() && g.lat <= bbox.getTop() &&
+                    g.lng >= bbox.getLeft() && g.lng <= bbox.getRight()) {
+                  anyPinsVisible = true;
+                  break;
+                }
+              }
+            }
+            if (!anyPinsVisible) {
+              mapSearchAreaBtn.classList.add('visible');
+            } else {
+              mapSearchAreaBtn.classList.remove('visible');
+            }
+          } else {
+            mapSearchAreaBtn.classList.remove('visible');
+          }
+        }
+      });
+
+      var discoveryPOIs = [
+        { name: 'Portillo\'s Hot Dogs', lat: 41.8924, lng: -87.6286, category: 'restaurant', rating: '4.4', reviews: '5.1K', distance: '0.5 mi', status: 'Open', hours: 'Closes 11 PM', buttons: ['website', 'reserve'], url: 'https://www.portillos.com', reserveUrl: null, address: '100 W Ontario St, Chicago, IL 60654', phone: '(312) 587-8910', overview: 'A Chicago fast-food institution famous for Chicago-style hot dogs, Italian beef sandwiches, and chocolate cake shakes since 1963.', img1: 'https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1551782450-17144efb9c50?w=200&h=120&fit=crop' },
+        { name: 'Chicago Riverwalk', lat: 41.8872, lng: -87.6277, category: 'attraction', rating: '4.7', reviews: '7.8K', distance: '0.2 mi', status: 'Open', hours: 'Open 24 hours', buttons: null, address: 'Chicago Riverwalk, Chicago, IL 60601', phone: null, overview: 'A 1.25-mile pedestrian waterfront along the south bank of the Chicago River, featuring restaurants, bars, kayak rentals, and public art.', img1: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=200&h=120&fit=crop' },
+        { name: 'Shedd Aquarium', lat: 41.8676, lng: -87.6140, category: 'attraction', rating: '4.5', reviews: '9.3K', distance: '0.9 mi', status: 'Open', hours: 'Closes 5 PM', buttons: ['website', 'tickets'], url: 'https://www.sheddaquarium.org', ticketsUrl: 'https://www.sheddaquarium.org/plan-a-visit/buy-tickets', address: '1200 S DuSable Lake Shore Dr, Chicago, IL 60605', phone: '(312) 939-2438', overview: 'One of the largest indoor aquariums in the world, home to 32,000+ animals including beluga whales, dolphins, sea otters, and a Caribbean reef exhibit.', img1: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=200&h=120&fit=crop' },
+        { name: 'Field Museum', lat: 41.8663, lng: -87.6170, category: 'attraction', rating: '4.7', reviews: '8.6K', distance: '1.0 mi', status: 'Open', hours: 'Closes 5 PM', buttons: ['website', 'tickets'], url: 'https://www.fieldmuseum.org', ticketsUrl: 'https://www.fieldmuseum.org/visit/tickets', address: '1400 S DuSable Lake Shore Dr, Chicago, IL 60605', phone: '(312) 922-9410', overview: 'A world-class natural history museum home to SUE, the largest and most complete T. rex skeleton ever found. Over 40 million artifacts and specimens.', img1: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1581373449483-37449f962b6c?w=200&h=120&fit=crop' },
+        { name: 'Adler Planetarium', lat: 41.8663, lng: -87.6068, category: 'attraction', rating: '4.4', reviews: '4.2K', distance: '1.3 mi', status: 'Open', hours: 'Closes 4 PM', buttons: ['website', 'tickets'], url: 'https://www.adlerplanetarium.org', ticketsUrl: 'https://www.adlerplanetarium.org/visit/tickets', address: '1300 S DuSable Lake Shore Dr, Chicago, IL 60605', phone: '(312) 922-7827', overview: 'America\'s first planetarium, offering immersive sky shows, space science exhibitions, and stunning views of the Chicago skyline from Museum Campus.', img1: 'https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=200&h=120&fit=crop' },
+        { name: 'Wrigley Field', lat: 41.9484, lng: -87.6553, category: 'activity', rating: '4.7', reviews: '14.2K', distance: '4.8 mi', status: 'Open', hours: 'Event hours', buttons: ['website', 'tickets'], url: 'https://www.mlb.com/cubs', ticketsUrl: 'https://www.mlb.com/cubs/tickets', address: '1060 W Addison St, Chicago, IL 60613', phone: '(773) 404-2827', overview: 'The legendary home of the Chicago Cubs since 1914. One of the oldest ballparks in MLB, known for its ivy-covered outfield walls and iconic red marquee.', img1: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=200&h=120&fit=crop' },
+        { name: 'Museum of Science & Industry', lat: 41.7906, lng: -87.5831, category: 'attraction', rating: '4.7', reviews: '10.5K', distance: '5.2 mi', status: 'Open', hours: 'Closes 4 PM', buttons: ['website', 'tickets'], url: 'https://www.msichicago.org', ticketsUrl: 'https://www.msichicago.org/visit/buy-tickets', address: '5700 S DuSable Lake Shore Dr, Chicago, IL 60637', phone: '(773) 684-1414', overview: 'The largest science museum in the Western Hemisphere, featuring a captured WWII German U-boat, a coal mine replica, and interactive science exhibits.', img1: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1524168272322-bf73616d9cb5?w=200&h=120&fit=crop' },
+        { name: 'Giordano\'s', lat: 41.8963, lng: -87.6267, category: 'restaurant', rating: '4.3', reviews: '6.4K', distance: '0.7 mi', status: 'Open', hours: 'Closes 11 PM', buttons: ['website', 'reserve'], url: 'https://giordanos.com', reserveUrl: null, address: '730 N Rush St, Chicago, IL 60611', phone: '(312) 951-0747', overview: 'Famous for its stuffed deep-dish pizza with a flaky, buttery crust and layers of cheese. A Chicago pizza rivalry staple since 1974.', img1: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=200&h=120&fit=crop' },
+        { name: '360 Chicago', lat: 41.8988, lng: -87.6231, category: 'attraction', rating: '4.5', reviews: '3.9K', distance: '1.1 mi', status: 'Open', hours: 'Closes 10 PM', buttons: ['website', 'tickets'], url: 'https://360chicago.com', ticketsUrl: 'https://360chicago.com/tickets', address: '875 N Michigan Ave, Chicago, IL 60611', phone: '(888) 875-8439', overview: 'An observation deck on the 94th floor of the former John Hancock Center. Features TILT, a moving platform that tilts you over Michigan Avenue.', img1: 'https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=200&h=120&fit=crop' },
+        { name: 'Lincoln Park Zoo', lat: 41.9211, lng: -87.6340, category: 'park', rating: '4.6', reviews: '8.1K', distance: '2.9 mi', status: 'Open', hours: 'Closes 5 PM', buttons: null, address: '2001 N Clark St, Chicago, IL 60614', phone: '(312) 742-2000', overview: 'One of the oldest zoos in North America and one of the few remaining free-admission zoos. Home to over 1,100 animals and lush gardens.', img1: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=200&h=120&fit=crop' },
+        { name: 'Soldier Field', lat: 41.8623, lng: -87.6167, category: 'activity', rating: '4.3', reviews: '5.6K', distance: '1.2 mi', status: 'Open', hours: 'Event hours', buttons: ['website', 'tickets'], url: 'https://www.soldierfield.com', ticketsUrl: 'https://www.soldierfield.com/events', address: '1410 Special Olympics Dr, Chicago, IL 60605', phone: '(312) 235-7000', overview: 'Home of the Chicago Bears since 1971. A National Historic Landmark that also hosts concerts, soccer matches, and other major events.', img1: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1524168272322-bf73616d9cb5?w=200&h=120&fit=crop' },
+        { name: 'Magnificent Mile', lat: 41.8946, lng: -87.6246, category: 'attraction', rating: '4.5', reviews: '6.9K', distance: '0.8 mi', status: 'Open', hours: 'Store hours vary', buttons: null, address: 'N Michigan Ave, Chicago, IL 60611', phone: null, overview: 'Chicago\'s premier shopping and dining destination stretching 13 blocks along North Michigan Avenue, featuring luxury brands, department stores, and restaurants.', img1: 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=200&h=120&fit=crop' },
+        { name: 'Chinatown', lat: 41.8517, lng: -87.6315, category: 'attraction', rating: '4.4', reviews: '3.2K', distance: '2.1 mi', status: 'Open', hours: 'Store hours vary', buttons: null, address: 'S Wentworth Ave, Chicago, IL 60616', phone: null, overview: 'One of the oldest Chinatowns in the US, featuring authentic dim sum restaurants, bakeries, herbal shops, and the striking Chinatown Gate.', img1: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=200&h=120&fit=crop' },
+        { name: 'Pilsen Murals', lat: 41.8525, lng: -87.6563, category: 'attraction', rating: '4.6', reviews: '1.8K', distance: '2.4 mi', status: 'Open', hours: 'Open 24 hours', buttons: null, address: '18th St, Pilsen, Chicago, IL 60608', phone: null, overview: 'A vibrant Mexican-American neighborhood renowned for colorful street murals, galleries, authentic taquerias, and the National Museum of Mexican Art.', img1: 'https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1584982751601-97dcc096659c?w=200&h=120&fit=crop' },
+        { name: 'Garfield Park Conservatory', lat: 41.8863, lng: -87.7171, category: 'park', rating: '4.8', reviews: '4.5K', distance: '4.7 mi', status: 'Open', hours: 'Closes 5 PM', buttons: ['website', 'tickets'], url: 'https://garfieldconservatory.org', ticketsUrl: 'https://garfieldconservatory.org/visit/', address: '300 N Central Park Ave, Chicago, IL 60624', phone: '(773) 638-1766', overview: 'One of the largest and most stunning botanical conservatories in the nation. Free admission to 6 indoor gardens and 12 acres of outdoor gardens.', img1: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1524168272322-bf73616d9cb5?w=200&h=120&fit=crop' },
+        { name: 'United Center', lat: 41.8807, lng: -87.6742, category: 'activity', rating: '4.5', reviews: '7.3K', distance: '2.5 mi', status: 'Open', hours: 'Event hours', buttons: ['website', 'tickets'], url: 'https://www.unitedcenter.com', ticketsUrl: 'https://www.unitedcenter.com/events', address: '1901 W Madison St, Chicago, IL 60612', phone: '(312) 455-4500', overview: 'Home of the Chicago Bulls and Chicago Blackhawks. Also hosts major concerts, events, and features the iconic Michael Jordan statue outside.', img1: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=200&h=120&fit=crop' },
+        { name: 'Humboldt Park', lat: 41.9022, lng: -87.7015, category: 'park', rating: '4.5', reviews: '2.7K', distance: '3.9 mi', status: 'Open', hours: 'Open 24 hours', buttons: null, address: '1400 N Sacramento Ave, Chicago, IL 60622', phone: null, overview: 'A 207-acre park featuring a boathouse, lagoon, beach, baseball diamonds, and the famous Puerto Rican flag gateway arches on Division Street.', img1: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=200&h=120&fit=crop' },
+        { name: 'Smoque BBQ', lat: 41.9519, lng: -87.7130, category: 'restaurant', rating: '4.7', reviews: '4.1K', distance: '5.6 mi', status: 'Open', hours: 'Closes 9 PM', buttons: ['website', 'reserve'], url: 'https://www.smoquebbq.com', reserveUrl: null, address: '3800 N Pulaski Rd, Chicago, IL 60641', phone: '(773) 545-7427', overview: 'Widely considered the best BBQ in Chicago. Slow-smoked brisket, pulled pork, and ribs with homemade sides in a casual counter-service setting.', img1: 'https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1551782450-17144efb9c50?w=200&h=120&fit=crop' },
+        { name: 'Montrose Beach', lat: 41.9637, lng: -87.6383, category: 'park', rating: '4.6', reviews: '3.4K', distance: '5.9 mi', status: 'Open', hours: 'Open 24 hours', buttons: null, address: '4400 N Simonds Dr, Chicago, IL 60640', phone: null, overview: 'One of Chicago\'s most popular beaches with a dog-friendly area, sand volleyball courts, kayak rentals, and views of the downtown skyline across the lake.', img1: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=200&h=120&fit=crop' },
+        { name: 'Logan Square Farmers Market', lat: 41.9295, lng: -87.7081, category: 'activity', rating: '4.8', reviews: '1.9K', distance: '4.8 mi', status: 'Open', hours: 'Sundays 10 AM–3 PM', buttons: null, address: '3107 W Logan Blvd, Chicago, IL 60647', phone: null, overview: 'One of the city\'s best farmers markets, featuring local produce, artisan foods, live music, and prepared food vendors every Sunday from May through October.', img1: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&h=120&fit=crop' },
+        { name: 'Hyde Park', lat: 41.7943, lng: -87.5907, category: 'attraction', rating: '4.5', reviews: '2.6K', distance: '6.1 mi', status: 'Open', hours: 'Open 24 hours', buttons: null, address: 'Hyde Park, Chicago, IL 60615', phone: null, overview: 'Home to the University of Chicago, the Obama Presidential Center (under construction), and the Museum of Science and Industry. A culturally rich South Side neighborhood.', img1: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1581373449483-37449f962b6c?w=200&h=120&fit=crop' },
+        { name: 'Promontory Point', lat: 41.7946, lng: -87.5793, category: 'park', rating: '4.8', reviews: '2.1K', distance: '6.4 mi', status: 'Open', hours: 'Open 24 hours', buttons: null, address: '5491 S DuSable Lake Shore Dr, Chicago, IL 60615', phone: null, overview: 'A beloved lakefront park jutting into Lake Michigan with panoramic skyline views, fire pits, and one of the best sunset spots in Chicago.', img1: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=200&h=120&fit=crop' }
+      ];
+
+      function searchThisArea() {
+        removePOIMarkers();
+        if (typeof closeBusinessOverlay === 'function') closeBusinessOverlay();
+        var bounds = map.getViewModel().getLookAtData().bounds;
+        if (!bounds) return;
+        var bbox = bounds.getBoundingBox();
+        var visiblePOIs = [];
+        var allPOIs = chicagoPOIs.concat(discoveryPOIs);
+        allPOIs.forEach(function(poi) {
+          if (poi.lat >= bbox.getBottom() && poi.lat <= bbox.getTop() &&
+              poi.lng >= bbox.getLeft() && poi.lng <= bbox.getRight()) {
+            visiblePOIs.push(poi);
+          }
+        });
+        chicagoPOIs.length = 0;
+        visiblePOIs.forEach(function(p) { chicagoPOIs.push(p); });
+        addPOIMarkers();
+        mapSearchAreaBtn.classList.remove('visible');
+        mapExpandedCenter = map.getCenter();
+      }
+
+      mapSearchAreaBtn.addEventListener('click', function() {
+        searchThisArea();
+      });
+
+      window.addEventListener('supertop-map-expanded', function(e) {
+        if (e.detail && e.detail.expanded) {
+          mapExpandedCenter = map.getCenter();
+          mapSearchAreaBtn.classList.remove('visible');
+        } else {
+          mapExpandedCenter = null;
+          mapSearchAreaBtn.classList.remove('visible');
+        }
+      });
+
+      document.getElementById('mapZoomIn').addEventListener('click', function() {
+        map.setZoom(map.getZoom() + 1, true);
+      });
+      document.getElementById('mapZoomOut').addEventListener('click', function() {
+        map.setZoom(map.getZoom() - 1, true);
+      });
+
+      var poiMarkers = [];
+      var chicagoPOIs = [
+        { name: 'Cloud Gate (The Bean)', lat: 41.8827, lng: -87.6233, category: 'attraction', rating: '4.8', reviews: '12.4K', distance: '0.3 mi', status: 'Open', hours: 'Open 24 hours', buttons: null, address: '201 E Randolph St, Chicago, IL 60602', phone: null, overview: 'Cloud Gate, nicknamed "The Bean," is a public sculpture by Sir Anish Kapoor in Millennium Park. The stainless steel work reflects the Chicago skyline and visitors walking beneath it.', img1: 'https://images.unsplash.com/photo-1584982751601-97dcc096659c?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1524168272322-bf73616d9cb5?w=200&h=120&fit=crop' },
+        { name: 'Willis Tower Skydeck', lat: 41.8789, lng: -87.6359, category: 'attraction', rating: '4.6', reviews: '8.2K', distance: '0.8 mi', status: 'Open', hours: 'Closes 8 PM', buttons: ['website', 'tickets'], url: 'https://www.willistower.com/skydeck', ticketsUrl: 'https://www.willistower.com/skydeck/buy-tickets', address: '233 S Wacker Dr, Chicago, IL 60606', phone: '(312) 875-9696', overview: 'The Skydeck on the 103rd floor of Willis Tower offers stunning views of up to four states. Step onto The Ledge, a glass balcony extending 4.3 feet from the building.', img1: 'https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=200&h=120&fit=crop' },
+        { name: 'Art Institute of Chicago', lat: 41.8796, lng: -87.6237, category: 'attraction', rating: '4.9', reviews: '15.1K', distance: '0.4 mi', status: 'Open', hours: 'Closes 5 PM', buttons: ['website', 'tickets'], url: 'https://www.artic.edu', ticketsUrl: 'https://sales.artic.edu/admissions', address: '111 S Michigan Ave, Chicago, IL 60603', phone: '(312) 443-3600', overview: 'One of the oldest and largest art museums in the United States, housing a collection spanning 5,000 years. Home to iconic works including "A Sunday on La Grande Jatte" and "American Gothic."', img1: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1581373449483-37449f962b6c?w=200&h=120&fit=crop' },
+        { name: 'Millennium Park', lat: 41.8826, lng: -87.6226, category: 'park', rating: '4.8', reviews: '9.7K', distance: '0.2 mi', status: 'Open', hours: 'Closes 11 PM', buttons: null, address: '201 E Randolph St, Chicago, IL 60602', phone: '(312) 742-1168', overview: 'A 24.5-acre public park in the Loop featuring Cloud Gate, Crown Fountain, the Jay Pritzker Pavilion, and Lurie Garden. Free concerts and events year-round.', img1: 'https://images.unsplash.com/photo-1524168272322-bf73616d9cb5?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1584982751601-97dcc096659c?w=200&h=120&fit=crop' },
+        { name: 'Lincoln Park', lat: 41.9214, lng: -87.6346, category: 'park', rating: '4.7', reviews: '5.3K', distance: '3.1 mi', status: 'Open', hours: 'Open 24 hours', buttons: null, address: '2045 N Lincoln Park W, Chicago, IL 60614', phone: null, overview: 'Chicago\'s largest public park stretching 7 miles along the lakefront. Home to Lincoln Park Zoo, the Nature Boardwalk, beaches, and miles of walking and cycling paths.', img1: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=200&h=120&fit=crop' },
+        { name: 'Grant Park', lat: 41.8758, lng: -87.6189, category: 'park', rating: '4.6', reviews: '4.1K', distance: '0.5 mi', status: 'Open', hours: 'Open 24 hours', buttons: null, address: '337 E Randolph St, Chicago, IL 60601', phone: '(312) 742-3918', overview: 'Known as "Chicago\'s front yard," Grant Park is home to Buckingham Fountain, Museum Campus, and hosts major events like Lollapalooza and Taste of Chicago.', img1: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=200&h=120&fit=crop' },
+        { name: "Lou Malnati's Pizzeria", lat: 41.8903, lng: -87.6339, category: 'restaurant', rating: '4.5', reviews: '3.8K', distance: '0.6 mi', status: 'Open', hours: 'Closes 10 PM', buttons: ['website', 'reserve'], url: 'https://www.loumalnatis.com', reserveUrl: 'https://www.opentable.com/r/lou-malnatis-pizzeria-chicago', address: '439 N Wells St, Chicago, IL 60654', phone: '(312) 828-9800', overview: 'A Chicago institution since 1971, famous for its buttery, flaky deep-dish pizza crust. Multiple locations, but the original Wells Street spot remains a must-visit.', img1: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=200&h=120&fit=crop' },
+        { name: 'Girl & The Goat', lat: 41.8841, lng: -87.6483, category: 'restaurant', rating: '4.4', reviews: '2.9K', distance: '1.4 mi', status: 'Closed', hours: 'Opens 4:30 PM', buttons: ['website', 'reserve'], url: 'https://www.girlandthegoat.com', reserveUrl: 'https://resy.com/cities/chi/girl-and-the-goat', address: '809 W Randolph St, Chicago, IL 60607', phone: '(312) 492-6262', overview: 'Top Chef winner Stephanie Izard\'s flagship restaurant in the West Loop. Known for bold, globally inspired dishes featuring goat, pork, and vegetable-forward plates.', img1: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=120&fit=crop' },
+        { name: 'Alinea', lat: 41.9135, lng: -87.6481, category: 'restaurant', rating: '4.7', reviews: '1.6K', distance: '2.8 mi', status: 'Closed', hours: 'Opens 5 PM', buttons: ['website', 'reserve'], url: 'https://www.alinearestaurant.com', reserveUrl: 'https://resy.com/cities/chi/alinea', address: '1723 N Halsted St, Chicago, IL 60614', phone: '(312) 867-0110', overview: 'A three-Michelin-star restaurant by Chef Grant Achatz, offering a multi-course tasting menu that pushes the boundaries of molecular gastronomy and presentation.', img1: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&h=120&fit=crop' },
+        { name: 'Architecture Boat Tour', lat: 41.8882, lng: -87.6248, category: 'activity', rating: '4.9', reviews: '6.5K', distance: '0.3 mi', status: 'Open', hours: 'Closes 7 PM', buttons: ['website', 'tickets'], url: 'https://www.architecture.org/tours', ticketsUrl: 'https://www.architecture.org/tours/book', address: '112 E Wacker Dr, Chicago, IL 60601', phone: '(312) 922-3432', overview: 'The #1 rated tour in Chicago. Cruise the Chicago River as expert docents narrate the stories behind over 50 iconic buildings along the riverfront.', img1: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=200&h=120&fit=crop' },
+        { name: 'Navy Pier', lat: 41.8917, lng: -87.6086, category: 'activity', rating: '4.3', reviews: '11.2K', distance: '1.2 mi', status: 'Open', hours: 'Closes 10 PM', buttons: ['website', 'tickets'], url: 'https://navypier.org', ticketsUrl: 'https://navypier.org/explore/rides-attractions/centennial-wheel/', address: '600 E Grand Ave, Chicago, IL 60611', phone: '(312) 595-7437', overview: 'A 3,300-foot pier on Lake Michigan featuring the 200-foot Centennial Wheel, rides, restaurants, the Chicago Children\'s Museum, and seasonal fireworks shows.', img1: 'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=200&h=120&fit=crop' },
+        { name: 'Second City Comedy', lat: 41.9114, lng: -87.6344, category: 'activity', rating: '4.6', reviews: '2.1K', distance: '2.5 mi', status: 'Open', hours: 'Closes 11 PM', buttons: ['website', 'tickets'], url: 'https://www.secondcity.com', ticketsUrl: 'https://www.secondcity.com/shows/chicago', address: '1616 N Wells St, Chicago, IL 60614', phone: '(312) 337-3992', overview: 'The legendary improv comedy theater that launched the careers of Tina Fey, Steve Carell, Bill Murray, and many more. Shows nightly in multiple stages.', img1: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=200&h=120&fit=crop', img2: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=200&h=120&fit=crop' }
+      ];
+      var pinIconUrl = window.location.origin + '/assets/Default-pin.svg';
+
+      var hoverCard = document.getElementById('mapHoverCard');
+      var hoverBridge = document.getElementById('mapHoverBridge');
+      var hoverCardImg1 = document.getElementById('mapHoverCardImg1');
+      var hoverCardImg2 = document.getElementById('mapHoverCardImg2');
+      var hoverCardName = document.getElementById('mapHoverCardName');
+      var hoverCardScore = document.getElementById('mapHoverCardScore');
+      var hoverCardReviews = document.getElementById('mapHoverCardReviews');
+      var hoverCardDistance = document.getElementById('mapHoverCardDistance');
+      var hoverCardCategory = document.getElementById('mapHoverCardCategory');
+      var hoverCardGallery = hoverCard.querySelector('.map-hover-card-gallery');
+
+      var CARD_W = 224, GAP = 4, PIN_W = 24, PIN_H = 32;
+
+      function showHoverCard(poi, screenX, screenY) {
+        activePoi = poi;
+        hoverCardImg1.src = poi.img1;
+        hoverCardGallery.classList.remove('single-image');
+        if (poi.img2 && poi.img2 !== poi.img1) {
+          hoverCardImg2.style.display = 'block';
+          hoverCardImg2.src = poi.img2;
+          hoverCardImg2.onerror = function() { hoverCardImg2.style.display = 'none'; hoverCardGallery.classList.add('single-image'); };
+        } else {
+          hoverCardImg2.style.display = 'none';
+          hoverCardGallery.classList.add('single-image');
+        }
+        hoverCardName.textContent = poi.name;
+        hoverCardScore.textContent = poi.rating;
+        hoverCardReviews.textContent = '(' + poi.reviews + ')';
+        hoverCardDistance.textContent = poi.distance;
+        var statusEl = document.getElementById('mapHoverCardStatus');
+        var hoursEl = document.getElementById('mapHoverCardHours');
+        statusEl.textContent = poi.status;
+        statusEl.className = poi.status === 'Open' ? 'map-hover-card-status-open' : 'map-hover-card-status-closed';
+        hoursEl.textContent = poi.hours;
+        hoverCardCategory.textContent = poi.category;
+
+        var actionsEl = document.getElementById('mapHoverCardActions');
+        var btn1 = document.getElementById('mapHoverCardBtn1');
+        var btn2 = document.getElementById('mapHoverCardBtn2');
+        var btn1Icon = document.getElementById('mapHoverCardBtn1Icon');
+        var btn1Text = document.getElementById('mapHoverCardBtn1Text');
+        var btn2Icon = document.getElementById('mapHoverCardBtn2Icon');
+        var btn2Text = document.getElementById('mapHoverCardBtn2Text');
+
+        if (poi.buttons && poi.buttons.length === 2 && poi.url) {
+          actionsEl.style.display = 'flex';
+          btn1Icon.src = '/assets/website.svg';
+          btn1Text.textContent = 'Website';
+          btn1.onclick = function() { window.open(poi.url, '_blank'); };
+          if (poi.buttons[1] === 'reserve') {
+            btn2Icon.src = '/assets/reserve.svg';
+            btn2Text.textContent = 'Reserve';
+            btn2.onclick = poi.reserveUrl ? function() { window.open(poi.reserveUrl, '_blank'); } : null;
+          } else {
+            btn2Icon.src = '/assets/tickets.svg';
+            btn2Text.textContent = 'Tickets';
+            btn2.onclick = poi.ticketsUrl ? function() { window.open(poi.ticketsUrl, '_blank'); } : null;
+          }
+        } else {
+          actionsEl.style.display = 'none';
+          btn1.onclick = null;
+        }
+
+        hoverCard.style.left = '-9999px';
+        hoverCard.style.top = '-9999px';
+        hoverCard.classList.add('active');
+        var CARD_H = hoverCard.offsetHeight;
+        hoverCard.classList.remove('active');
+
+        var mapRect = mapContainer.getBoundingClientRect();
+        var anchorX = mapRect.left + screenX;
+        var anchorY = mapRect.top + screenY;
+        var pinTop = anchorY - PIN_H;
+        var pinBot = anchorY;
+        var pinLeft = anchorX - PIN_W / 2;
+        var pinRight = anchorX + PIN_W / 2;
+
+        var spaceAbove = pinTop - mapRect.top;
+        var spaceBelow = mapRect.bottom - pinBot;
+        var spaceRight = mapRect.right - pinRight;
+        var spaceLeft = pinLeft - mapRect.left;
+
+        var cl, ct, bl, bt, bw, bh;
+
+        if (spaceAbove >= CARD_H + GAP) {
+          cl = anchorX - CARD_W / 2;
+          ct = pinTop - GAP - CARD_H;
+          bl = anchorX - PIN_W; bt = ct + CARD_H; bw = PIN_W * 2; bh = GAP;
+        } else if (spaceRight >= CARD_W + GAP) {
+          cl = pinRight + GAP;
+          ct = pinTop - CARD_H / 2 + PIN_H / 2;
+          bl = pinRight; bt = pinTop; bw = GAP; bh = PIN_H;
+        } else if (spaceLeft >= CARD_W + GAP) {
+          cl = pinLeft - GAP - CARD_W;
+          ct = pinTop - CARD_H / 2 + PIN_H / 2;
+          bl = pinLeft - GAP; bt = pinTop; bw = GAP; bh = PIN_H;
+        } else {
+          cl = anchorX - CARD_W / 2;
+          ct = pinBot + GAP;
+          bl = anchorX - PIN_W; bt = pinBot; bw = PIN_W * 2; bh = GAP;
+        }
+
+        if (cl < mapRect.left + 4) cl = mapRect.left + 4;
+        if (cl + CARD_W > mapRect.right - 4) cl = mapRect.right - CARD_W - 4;
+        if (ct < mapRect.top + 4) ct = mapRect.top + 4;
+        if (ct + CARD_H > mapRect.bottom - 4) ct = mapRect.bottom - CARD_H - 4;
+
+        hoverCard.style.left = cl + 'px';
+        hoverCard.style.top = ct + 'px';
+        hoverBridge.style.left = bl + 'px';
+        hoverBridge.style.top = bt + 'px';
+        hoverBridge.style.width = bw + 'px';
+        hoverBridge.style.height = bh + 'px';
+        hoverCard.classList.add('active');
+        hoverBridge.classList.add('active');
+      }
+
+      var hoverHideTimer = null;
+      var activeMarker = null;
+      var activePoi = null;
+
+      hoverCard.addEventListener('click', function(e) {
+        if (e.target.closest('.map-hover-card-btn')) return;
+        if (activePoi) {
+          hideHoverCard();
+          openBusinessOverlay(activePoi);
+        }
+      });
+      hoverCard.style.cursor = 'pointer';
+
+      function hideHoverCard() {
+        hoverCard.classList.remove('active');
+        hoverBridge.classList.remove('active');
+        if (activeMarker) { activeMarker.setIcon(defaultIcon); activeMarker = null; }
+      }
+
+      function scheduleHide() {
+        hoverHideTimer = setTimeout(function() { hideHoverCard(); }, 80);
+      }
+
+      function cancelHide() {
+        if (hoverHideTimer) { clearTimeout(hoverHideTimer); hoverHideTimer = null; }
+      }
+
+      hoverCard.addEventListener('mouseenter', cancelHide);
+      hoverCard.addEventListener('mouseleave', scheduleHide);
+      hoverBridge.addEventListener('mouseenter', cancelHide);
+      hoverBridge.addEventListener('mouseleave', scheduleHide);
+
+      var activePinUrl = window.location.origin + '/assets/active-map-pin-generic.svg';
+      var defaultIcon = new H.map.Icon(pinIconUrl, { size: { w: 22, h: 29 }, anchor: { x: 11, y: 29 } });
+      var activeIcon = new H.map.Icon(activePinUrl, { size: { w: 24, h: 32 }, anchor: { x: 12, y: 32 } });
+
+      function addPOIMarkers() {
+        if (poiMarkers.length) return;
+        chicagoPOIs.forEach(function(poi) {
+          var marker = new H.map.Marker({ lat: poi.lat, lng: poi.lng }, { icon: defaultIcon, data: poi });
+          marker.addEventListener('pointerenter', function() {
+            cancelHide();
+            if (activeMarker && activeMarker !== marker) activeMarker.setIcon(defaultIcon);
+            activeMarker = marker;
+            marker.setIcon(activeIcon);
+            var pos = map.geoToScreen(marker.getGeometry());
+            if (pos) showHoverCard(poi, pos.x, pos.y);
+          });
+          marker.addEventListener('pointerleave', function() {
+            scheduleHide();
+          });
+          marker.addEventListener('tap', function() {
+            hideHoverCard();
+            if (typeof openBusinessOverlay === 'function') openBusinessOverlay(poi);
+          });
+          map.addObject(marker);
+          poiMarkers.push(marker);
+        });
+      }
+
+      function removePOIMarkers() {
+        hideHoverCard();
+        poiMarkers.forEach(function(m) { map.removeObject(m); });
+        poiMarkers.length = 0;
+      }
+
+      window.addEventListener('supertop-map-expanded', function(e) {
+        if (e.detail && e.detail.expanded) {
+          addPOIMarkers();
+          var lats = chicagoPOIs.map(function(p) { return p.lat; });
+          var lngs = chicagoPOIs.map(function(p) { return p.lng; });
+          var targetLat = (Math.max.apply(null, lats) + Math.min.apply(null, lats)) / 2;
+          var targetLng = (Math.max.apply(null, lngs) + Math.min.apply(null, lngs)) / 2;
+          var targetZoom = 14;
+          var startLat = chicagoCenter.lat;
+          var startLng = chicagoCenter.lng;
+          var startZoom = map.getZoom();
+          var duration = 3000;
+          var startTime = null;
+          function animateMap(timestamp) {
+            if (!startTime) startTime = timestamp;
+            var elapsed = timestamp - startTime;
+            var t = Math.min(elapsed / duration, 1);
+            var ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+            map.setCenter({
+              lat: startLat + (targetLat - startLat) * ease,
+              lng: startLng + (targetLng - startLng) * ease
+            });
+            map.setZoom(startZoom + (targetZoom - startZoom) * ease);
+            if (t < 1) requestAnimationFrame(animateMap);
+          }
+          requestAnimationFrame(animateMap);
+        } else {
+          removePOIMarkers();
+          map.setCenter(chicagoCenter);
+          map.setZoom(9);
+        }
+      });
+    })();
+  </script>
+
+  <!-- Image Overlay -->
+  <div id="imageOverlay" class="image-overlay">
+    <div class="overlay-backdrop" onclick="closeImageOverlay()"></div>
+    <div class="overlay-modal">
+      <div class="overlay-header">
+        <div class="overlay-chips">
+          <button class="overlay-chip active">All (10)</button>
+          <button class="overlay-chip">Skyline (4)</button>
+          <button class="overlay-chip">Landmarks (3)</button>
+          <button class="overlay-chip">Neighborhoods (3)</button>
+        </div>
+        <button class="overlay-close" onclick="closeImageOverlay()" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="overlay-content">
+        <div class="overlay-main">
+          <div class="overlay-featured">
+            <img id="overlayFeaturedImg" src="https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=800&h=600&fit=crop" alt="" />
+            <button class="overlay-nav prev" onclick="prevOverlayImage()" aria-label="Previous">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3l-5 5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="overlay-nav next" onclick="nextOverlayImage()" aria-label="Next">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="overlay-meta">
+            <div class="overlay-author">
+              <div class="overlay-avatar">C</div>
+              <span>Choose Chicago • Travel photography</span>
+            </div>
+          </div>
+        </div>
+        <div class="overlay-thumbnails">
+          <div class="overlay-thumb-row">
+            <div class="overlay-thumb selected" onclick="selectOverlayImage(0)">
+              <img src="https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=200&h=200&fit=crop" alt="" />
+            </div>
+            <div class="overlay-thumb" onclick="selectOverlayImage(1)">
+              <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=200&h=200&fit=crop" alt="" />
+            </div>
+          </div>
+          <div class="overlay-thumb-row">
+            <div class="overlay-thumb" onclick="selectOverlayImage(2)">
+              <img src="https://images.unsplash.com/photo-1581373449483-37449f962b6c?w=200&h=200&fit=crop" alt="" />
+            </div>
+            <div class="overlay-thumb" onclick="selectOverlayImage(3)">
+              <img src="https://images.unsplash.com/photo-1584982751601-97dcc096659c?w=200&h=200&fit=crop" alt="" />
+            </div>
+          </div>
+          <div class="overlay-thumb-row">
+            <div class="overlay-thumb" onclick="selectOverlayImage(4)">
+              <img src="https://images.unsplash.com/photo-1524168272322-bf73616d9cb5?w=200&h=200&fit=crop" alt="" />
+            </div>
+            <div class="overlay-thumb" onclick="selectOverlayImage(5)">
+              <img src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=200&h=200&fit=crop" alt="" />
+            </div>
+          </div>
+          <div class="overlay-thumb-row">
+            <div class="overlay-thumb" onclick="selectOverlayImage(6)">
+              <img src="https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=200&h=200&fit=crop" alt="" />
+            </div>
+            <div class="overlay-thumb" onclick="selectOverlayImage(7)">
+              <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=200&h=200&fit=crop" alt="" />
+            </div>
+          </div>
+          <div class="overlay-thumb-row">
+            <div class="overlay-thumb" onclick="selectOverlayImage(8)">
+              <img src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=200&h=200&fit=crop" alt="" />
+            </div>
+            <div class="overlay-thumb" onclick="selectOverlayImage(9)">
+              <img src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=200&h=200&fit=crop" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var overlayImages = [
+      'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1581373449483-37449f962b6c?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1584982751601-97dcc096659c?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1524168272322-bf73616d9cb5?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=800&h=600&fit=crop'
+    ];
+    var currentOverlayIndex = 0;
+
+    function openImageOverlay() {
+      document.getElementById('imageOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageOverlay() {
+      document.getElementById('imageOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function selectOverlayImage(index) {
+      currentOverlayIndex = index;
+      document.getElementById('overlayFeaturedImg').src = overlayImages[index];
+      document.querySelectorAll('.overlay-thumb').forEach(function(thumb, i) {
+        thumb.classList.toggle('selected', i === index);
+      });
+    }
+
+    function prevOverlayImage() {
+      currentOverlayIndex = (currentOverlayIndex - 1 + overlayImages.length) % overlayImages.length;
+      selectOverlayImage(currentOverlayIndex);
+    }
+
+    function nextOverlayImage() {
+      currentOverlayIndex = (currentOverlayIndex + 1) % overlayImages.length;
+      selectOverlayImage(currentOverlayIndex);
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var imgOverlay = document.getElementById('imageOverlay');
+        if (imgOverlay && imgOverlay.classList.contains('active')) {
+          closeImageOverlay();
+        } else {
+          closeBusinessOverlay();
+        }
+      }
+    });
+  </script>
+
+  <!-- Business Overlay -->
+  <div id="businessBackdrop" class="business-overlay-backdrop" onclick="closeBusinessOverlay()"></div>
+  <div id="businessOverlay" class="business-overlay">
+    <div class="business-overlay-panel">
+      <div class="biz-content">
+        <div class="biz-header">
+          <div class="biz-title-row">
+            <div class="biz-header-content">
+              <h2 id="bizName" class="biz-name"></h2>
+              <div id="bizSubtitle" class="biz-subtitle"></div>
+            </div>
+            <button class="biz-close" onclick="closeBusinessOverlay()" aria-label="Close">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="biz-scrollable">
+        <div class="biz-gallery" onclick="openImageOverlay()" style="cursor:pointer;">
+            <div class="biz-gallery-main"><img id="bizImg1" src="" alt="" /></div>
+            <div class="biz-gallery-side">
+              <div class="biz-gallery-side-item"><img id="bizImg2" src="" alt="" /></div>
+              <div class="biz-gallery-side-item"><img id="bizImg3" src="" alt="" /></div>
+            </div>
+            <button type="button" class="supertop-gallery-more" aria-label="More images" onclick="event.stopPropagation(); openImageOverlay()">
+              <img src="/assets/images.svg" alt="" width="16" height="16" />
+            </button>
+          </div>
+          <div id="bizActions" class="biz-actions"></div>
+        <div class="biz-info-cards">
+          <div class="biz-info-card reviews" onclick="var r=document.getElementById('bizReviewsSection');if(r&&r.style.display!=='none'){r.scrollIntoView({behavior:'smooth',block:'center'})}" style="cursor:pointer;">
+            <div class="biz-info-card-header">
+              <span class="biz-info-card-title">Reviews</span>
+              <svg class="biz-info-card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="biz-info-card-value">
+              <img src="/assets/yelp-big.png" alt="Yelp" class="biz-info-card-yelp" />
+              <span id="bizRating"></span>
+            </div>
+            <span id="bizReviewCount" class="biz-info-card-sub"></span>
+          </div>
+          <div class="biz-info-card hours" onclick="var hrs=document.getElementById('bizHoursExpanded');if(hrs){hrs.classList.add('expanded');hrs.scrollIntoView({behavior:'smooth',block:'center'})}" style="cursor:pointer;">
+            <div class="biz-info-card-header">
+              <span class="biz-info-card-title">Hours</span>
+            </div>
+            <div id="bizHoursStatus" class="biz-info-card-value"></div>
+            <span id="bizHoursDetail" class="biz-info-card-sub"></span>
+          </div>
+        </div>
+        <div class="biz-overview" id="bizOverview" onclick="this.classList.toggle('expanded')">
+          <div class="biz-overview-header">
+            <div class="biz-overview-title">Overview</div>
+            <svg class="biz-overview-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div id="bizOverviewText" class="biz-overview-text"></div>
+        </div>
+        <div id="bizActionList" class="biz-action-list"></div>
+        <div id="bizReviewsSection" class="biz-reviews" style="display:none;"></div>
+        <div class="biz-verify">
+          <svg class="biz-verify-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm3.36 5.36l-4 4a.5.5 0 01-.72 0l-2-2a.5.5 0 01.72-.72L7 9.3l3.64-3.64a.5.5 0 01.72.72z"/></svg>
+          <span class="biz-verify-text">Is this your business? <strong>Verify your listing</strong></span>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openBusinessOverlay(poi) {
+      var navHeader = document.querySelector('.nav-header');
+      if (navHeader) {
+        document.documentElement.style.setProperty('--nav-height', navHeader.offsetHeight + 'px');
+      }
+      var overlay = document.getElementById('businessOverlay');
+      var backdrop = document.getElementById('businessBackdrop');
+      document.getElementById('bizImg1').src = poi.img1.replace('w=200&h=120', 'w=600&h=400');
+      document.getElementById('bizImg2').src = poi.img2 ? poi.img2.replace('w=200&h=120', 'w=300&h=200') : poi.img1.replace('w=200&h=120', 'w=300&h=200');
+      document.getElementById('bizImg3').src = poi.img1.replace('w=200&h=120', 'w=300&h=200');
+      document.getElementById('bizName').textContent = poi.name;
+      document.getElementById('bizSubtitle').textContent = poi.category + ' · ' + poi.distance;
+      document.getElementById('bizRating').textContent = poi.rating + ' on Yelp';
+      document.getElementById('bizReviewCount').textContent = poi.reviews + ' reviews';
+
+      var statusEl = document.getElementById('bizHoursStatus');
+      statusEl.textContent = poi.status;
+      statusEl.className = 'biz-info-card-value' + (poi.status === 'Open' ? ' open' : '');
+      document.getElementById('bizHoursDetail').textContent = poi.hours;
+
+      document.getElementById('bizOverviewText').textContent = poi.overview || 'A popular ' + poi.category + ' in Chicago. Highly rated by visitors and locals alike.';
+
+      var actionsHtml = '';
+      if (poi.url) {
+        actionsHtml += '<a class="biz-action-btn" href="' + poi.url + '" target="_blank"><img src="/assets/website.svg" alt="" />Website</a>';
+      }
+      if (poi.reserveUrl) {
+        actionsHtml += '<a class="biz-action-btn" href="' + poi.reserveUrl + '" target="_blank"><img src="/assets/reserve.svg" alt="" />Reserve</a>';
+      }
+      if (poi.ticketsUrl) {
+        actionsHtml += '<a class="biz-action-btn" href="' + poi.ticketsUrl + '" target="_blank"><img src="/assets/tickets.svg" alt="" />Tickets</a>';
+      }
+      document.getElementById('bizActions').innerHTML = actionsHtml;
+
+      var listHtml = '';
+      var linkIcon = '<svg class="biz-action-link-icon" viewBox="0 0 16 16" fill="none"><path d="M6.5 3.5h-3a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-3M9.5 2.5h4v4M14 2L7 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      if (poi.url) {
+        var domain = poi.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
+        listHtml += '<div class="biz-action-row clickable" onclick="window.open(\'' + poi.url + '\',\'_blank\')"><img class="biz-action-icon" src="/assets/website.svg" alt="" /><div class="biz-action-label-wrap"><span class="biz-action-label">' + domain + '</span>' + linkIcon + '</div></div>';
+      }
+      if (poi.category === 'restaurant' && poi.url) {
+        listHtml += '<div class="biz-action-row clickable" onclick="window.open(\'' + poi.url + '\',\'_blank\')"><img class="biz-action-icon" src="/assets/order.svg" alt="" /><div class="biz-action-label-wrap"><span class="biz-action-label">Order online</span>' + linkIcon + '</div></div>';
+      }
+      if (poi.address) {
+        listHtml += '<div class="biz-action-row"><img class="biz-action-icon" src="/assets/address.svg" alt="" /><div class="biz-action-label-wrap"><span class="biz-action-label">' + poi.address + '</span></div></div>';
+      }
+      if (poi.phone) {
+        listHtml += '<div class="biz-action-row clickable" onclick="window.open(\'tel:' + poi.phone + '\')"><img class="biz-action-icon" src="/assets/call.svg" alt="" /><div class="biz-action-label-wrap"><span class="biz-action-label">' + poi.phone + '</span></div></div>';
+      }
+      var statusClass = poi.status === 'Open' ? ' status-open' : '';
+      listHtml += '<div class="biz-action-row clickable" id="bizHoursRow" onclick="document.getElementById(\'bizHoursExpanded\').classList.toggle(\'expanded\')"><img class="biz-action-icon" src="/assets/hours.svg" alt="" /><div class="biz-action-label-wrap"><span class="biz-action-label' + statusClass + '">' + poi.status + '</span><span class="biz-action-dot">•</span><span class="biz-action-label">' + poi.hours + '</span><svg class="biz-action-link-icon biz-hours-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>';
+      listHtml += '<div class="biz-hours-expanded" id="bizHoursExpanded"><div class="biz-hours-grid">';
+      var days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+      var today = new Date().getDay();
+      var todayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][today];
+      days.forEach(function(d) {
+        var isToday = d === todayName;
+        var hrs = (poi.hours === 'Open 24 hours') ? '24 hours' : (poi.hours === 'Event hours' ? 'Varies' : '11:00 AM – ' + poi.hours.replace('Closes ','').replace('Opens ',''));
+        listHtml += '<div class="biz-hours-row' + (isToday ? ' today' : '') + '"><span class="biz-hours-day">' + d + '</span><span class="biz-hours-time">' + hrs + '</span></div>';
+      });
+      listHtml += '</div></div>';
+      document.getElementById('bizActionList').innerHTML = listHtml;
+
+      var reviewsSection = document.getElementById('bizReviewsSection');
+      var sampleReviews = {
+        'restaurant': [
+          { stars: 5, author: 'Sarah M.', date: 'Feb 2026', text: 'Absolutely incredible experience! The food was outstanding and the service was impeccable. Every dish was a work of art. Can\'t wait to come back.' },
+          { stars: 4, author: 'James T.', date: 'Jan 2026', text: 'Great atmosphere and delicious food. The wait was a bit long on a Saturday night but totally worth it. The deep-dish was perfectly crispy.' },
+          { stars: 5, author: 'Maria L.', date: 'Jan 2026', text: 'Best dining experience in Chicago, hands down. The staff made us feel so welcome and every course was better than the last.' }
+        ],
+        'attraction': [
+          { stars: 5, author: 'David K.', date: 'Feb 2026', text: 'An absolute must-visit when in Chicago. The views are breathtaking and the exhibits are world-class. We spent the entire day here and could have stayed longer.' },
+          { stars: 4, author: 'Emily R.', date: 'Jan 2026', text: 'Really enjoyed our visit. A bit crowded on weekends but the experience is worth it. Great for families and solo travelers alike.' },
+          { stars: 5, author: 'Tom H.', date: 'Dec 2025', text: 'One of the best attractions I\'ve ever visited. Well-maintained, informative, and genuinely fun. Chicago should be proud of this gem.' }
+        ],
+        'activity': [
+          { stars: 5, author: 'Rachel W.', date: 'Feb 2026', text: 'What an amazing experience! Our guide was incredibly knowledgeable and entertaining. Learned so much about Chicago\'s history and architecture.' },
+          { stars: 5, author: 'Mike D.', date: 'Jan 2026', text: 'Absolutely the best thing we did in Chicago. Book early because it sells out! The views from the water are unbeatable.' },
+          { stars: 4, author: 'Lisa P.', date: 'Jan 2026', text: 'Really fun time. Great for date night or a group outing. The energy is infectious and the talent is top-notch.' }
+        ]
+      };
+
+      var reviews = sampleReviews[poi.category] || sampleReviews['attraction'];
+      if (poi.reviews) {
+        function ratingIcon(stars) {
+          var s = '';
+          for (var i = 0; i < 5; i++) {
+            s += '<img class="biz-review-star' + (i >= stars ? ' empty' : '') + '" src="/assets/Retail/Icon,%20Yelp.svg" alt="" />';
+          }
+          return s;
+        }
+        var rHtml = '<h3 class="biz-reviews-title">Reviews</h3>';
+        rHtml += '<span class="biz-reviews-count">' + poi.reviews + ' reviews on Yelp</span>';
+        reviews.forEach(function(r) {
+          rHtml += '<div class="biz-review-item">';
+          rHtml += '<div class="biz-review-header"><div class="biz-review-stars">' + ratingIcon(r.stars) + '</div>';
+          rHtml += '<span class="biz-review-author">' + r.author + '</span>';
+          rHtml += '<span class="biz-review-date">· ' + r.date + '</span></div>';
+          rHtml += '<p class="biz-review-text">' + r.text + '</p>';
+          rHtml += '</div>';
+        });
+        rHtml += '<button class="biz-reviews-more" type="button">See all reviews on Yelp <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+        reviewsSection.innerHTML = rHtml;
+        reviewsSection.style.display = 'flex';
+      } else {
+        reviewsSection.style.display = 'none';
+      }
+
+      overlay.classList.add('active');
+      var mapWrap = document.querySelector('.supertop-map');
+      if (mapWrap && mapWrap.classList.contains('is-expanded')) {
+        mapWrap.style.width = 'calc(100% - 446px - 24px + 268px)';
+        mapWrap.style.maxWidth = 'calc(1146px - 446px - 24px + 268px)';
+        setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 50);
+        var rafResize = requestAnimationFrame(function tick() {
+          window.dispatchEvent(new Event('resize'));
+          if (overlay.classList.contains('active')) requestAnimationFrame(tick);
+        });
+        setTimeout(function() { cancelAnimationFrame(rafResize); }, 350);
+      }
+    }
+
+    function closeBusinessOverlay() {
+      var overlay = document.getElementById('businessOverlay');
+      if (!overlay.classList.contains('active')) return;
+      overlay.classList.remove('active');
+      var mapWrap = document.querySelector('.supertop-map');
+      if (mapWrap) {
+        mapWrap.style.width = '';
+        mapWrap.style.maxWidth = '';
+        var startTime = Date.now();
+        function resizeTick() {
+          window.dispatchEvent(new Event('resize'));
+          if (Date.now() - startTime < 500) {
+            requestAnimationFrame(resizeTick);
+          } else {
+            window.dispatchEvent(new Event('resize'));
+          }
+        }
+        requestAnimationFrame(resizeTick);
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      var overlay = document.getElementById('businessOverlay');
+      if (!overlay.classList.contains('active')) return;
+      var mapEl = document.querySelector('.supertop-map');
+      var hoverCardEl = document.getElementById('mapHoverCard');
+      var hoverBridgeEl = document.getElementById('mapHoverBridge');
+      var imageOverlay = document.getElementById('imageOverlay');
+      if (overlay.contains(e.target)) return;
+      if (mapEl && mapEl.contains(e.target)) return;
+      if (hoverCardEl && hoverCardEl.contains(e.target)) return;
+      if (hoverBridgeEl && hoverBridgeEl.contains(e.target)) return;
+      if (imageOverlay && imageOverlay.contains(e.target)) return;
+      closeBusinessOverlay();
+    });
+  </script>
+  </div><!-- End Protected Content -->
+
+  <script>
+    (function() {
+      'use strict';
+      var VALID_HASH = 'bba6ed82099bc7777e518d1e9d3233c9e3b996fd10b42752a59091538baa5f64';
+      var SESSION_KEY = '_proto_auth_v2';
+      var ATTEMPT_KEY = '_proto_attempts';
+      var LOCKOUT_KEY = '_proto_lockout';
+      var MAX_ATTEMPTS = 5;
+      var LOCKOUT_DURATION = 300000;
+
+      async function hashPassword(password) {
+        var encoder = new TextEncoder();
+        var data = encoder.encode(password + '_yahoo_proto_salt_2026');
+        var hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        var hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      }
+
+      function isAuthenticated() {
+        var authToken = sessionStorage.getItem(SESSION_KEY);
+        if (!authToken) return false;
+        try {
+          var d = JSON.parse(atob(authToken));
+          if (Date.now() - d.timestamp > 14400000) { sessionStorage.removeItem(SESSION_KEY); return false; }
+          return d.verified === true;
+        } catch (e) { sessionStorage.removeItem(SESSION_KEY); return false; }
+      }
+
+      function isLockedOut() {
+        var lockoutTime = localStorage.getItem(LOCKOUT_KEY);
+        if (!lockoutTime) return false;
+        if (Date.now() - parseInt(lockoutTime) > LOCKOUT_DURATION) {
+          localStorage.removeItem(LOCKOUT_KEY);
+          localStorage.removeItem(ATTEMPT_KEY);
+          return false;
+        }
+        return true;
+      }
+
+      function getRemainingLockout() {
+        var lockoutTime = localStorage.getItem(LOCKOUT_KEY);
+        if (!lockoutTime) return 0;
+        return Math.max(0, Math.ceil((LOCKOUT_DURATION - (Date.now() - parseInt(lockoutTime))) / 1000));
+      }
+
+      function recordFailedAttempt() {
+        var attempts = parseInt(localStorage.getItem(ATTEMPT_KEY) || '0') + 1;
+        localStorage.setItem(ATTEMPT_KEY, attempts.toString());
+        if (attempts >= MAX_ATTEMPTS) localStorage.setItem(LOCKOUT_KEY, Date.now().toString());
+        return MAX_ATTEMPTS - attempts;
+      }
+
+      function setAuthenticated() {
+        var token = btoa(JSON.stringify({ verified: true, timestamp: Date.now(), ua: navigator.userAgent.slice(0, 50) }));
+        sessionStorage.setItem(SESSION_KEY, token);
+        localStorage.removeItem(ATTEMPT_KEY);
+        localStorage.removeItem(LOCKOUT_KEY);
+      }
+
+      var overlay = document.getElementById('passwordOverlay');
+      var protectedContent = document.getElementById('protectedContent');
+      var form = document.getElementById('passwordForm');
+      var input = document.getElementById('passwordInput');
+      var errorMsg = document.getElementById('errorMsg');
+      var toggleBtn = document.getElementById('togglePassword');
+
+      function showError(message) {
+        errorMsg.textContent = message;
+        errorMsg.classList.add('visible');
+        input.classList.add('error');
+        setTimeout(function() { input.classList.remove('error'); }, 400);
+      }
+
+      function clearError() {
+        errorMsg.classList.remove('visible');
+        input.classList.remove('error');
+      }
+
+      function unlockContent() {
+        overlay.classList.add('hidden');
+        protectedContent.classList.add('unlocked');
+        document.body.style.overflow = '';
+        setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 100);
+      }
+
+      if (isAuthenticated()) {
+        unlockContent();
+      } else {
+        document.body.style.overflow = 'hidden';
+        if (isLockedOut()) {
+          var remaining = getRemainingLockout();
+          showError('Too many attempts. Try again in ' + Math.ceil(remaining / 60) + ' minutes.');
+          input.disabled = true;
+        }
+      }
+
+      toggleBtn.addEventListener('click', function() {
+        var type = input.type === 'password' ? 'text' : 'password';
+        input.type = type;
+        this.innerHTML = type === 'password'
+          ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+          : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+      });
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        clearError();
+        if (isLockedOut()) {
+          showError('Too many attempts. Try again in ' + Math.ceil(getRemainingLockout() / 60) + ' minutes.');
+          return;
+        }
+        var password = input.value.trim();
+        if (!password) { showError('Please enter a password'); return; }
+        var inputHash = await hashPassword(password);
+        if (inputHash === VALID_HASH) {
+          setAuthenticated();
+          unlockContent();
+        } else {
+          var rem = recordFailedAttempt();
+          if (rem <= 0) {
+            showError('Too many attempts. Please wait 5 minutes.');
+            input.disabled = true;
+            input.value = '';
+          } else {
+            showError('Incorrect password. ' + rem + ' attempts remaining.');
+          }
+          input.value = '';
+          input.focus();
+        }
+      });
+
+      input.addEventListener('input', clearError);
+
+      document.addEventListener('keydown', function(e) {
+        if (!isAuthenticated()) {
+          if (e.key === 'F12' ||
+              (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) ||
+              (e.ctrlKey && (e.key === 'U' || e.key === 'u')) ||
+              (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'i'))) {
+            e.preventDefault();
+            return false;
+          }
+        }
+      });
+
+      document.addEventListener('contextmenu', function(e) {
+        if (!isAuthenticated()) { e.preventDefault(); return false; }
+      });
+
+      if (!isAuthenticated()) setTimeout(function() { input.focus(); }, 100);
+    })();
+  </script>
+</body>
+</html>
