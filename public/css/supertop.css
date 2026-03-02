@@ -631,9 +631,9 @@
 /* Flight amount – UDS body1/emphasized */
 .supertop-flights-amount {
   font-family: var(--uds-font-sans);
-  font-size: var(--uds-text-body1-size);
-  font-weight: var(--uds-text-ui2-weight);
-  line-height: var(--uds-text-body1-line-height);
+  font-size: var(--uds-text-title3-size);
+  font-weight: var(--uds-text-title3-weight);
+  line-height: var(--uds-text-title3-line-height);
   color: var(--uds-foreground-primary);
 }
 
@@ -750,15 +750,22 @@
 }
 
 .overlay-close {
-  width: 24px;
-  height: 24px;
-  background: none;
+  width: var(--uds-space-xl);
+  height: var(--uds-space-xl);
+  border-radius: var(--uds-radius-full);
+  background: var(--uds-spectrum-carbon-2);
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   color: var(--uds-foreground-primary);
+  transition: background-color 0.15s ease;
+}
+
+.overlay-close:hover {
+  background: var(--uds-line-secondary);
 }
 
 .overlay-content {
