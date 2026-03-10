@@ -9,6 +9,21 @@
     "CityCenter.Class6.Label.Size": ["interpolate", ["linear"], ["zoom"], 5, 13, 9, 14, 15, 21, 20, 21, 24, 21],
     "CityCenter.Class7.Label.Size": ["interpolate", ["linear"], ["zoom"], 6, 12, 9, 13, 15, 19, 20, 19, 24, 19],
     "CityCenter.Hamlet.Label.Size": ["interpolate", ["linear"], ["zoom"], 7, 12, 9, 12, 16, 17, 20, 17, 24, 17],
-    "Neighborhood.Label.Size": ["interpolate", ["linear"], ["zoom"], 7, 11, 9, 11, 16, 16, 20, 16, 24, 16]
+    "Neighborhood.Label.Size": ["interpolate", ["linear"], ["zoom"], 7, 11, 9, 11, 16, 16, 20, 16, 24, 16],
+    "POI.Icon.Size": 0,
+    "POI.Label.Size": 0,
+    "POI.Accomodation.Label.Color": "#00000000",
+    "POI.BusinessServicesAreas.Label.Color": "#00000000",
+    "POI.EatDrink.Label.Color": "#00000000",
+    "POI.Entertainment.Label.Color": "#00000000",
+    "POI.Facilities.Label.Color": "#00000000",
+    "POI.LeisureOutdoor.Label.Color": "#00000000",
+    "POI.Shopping.Label.Color": "#00000000",
+    "POI.SightsMuseum.Label.Color": "#00000000",
+    "POI.MountainPeak.Label.Size": 0,
+    "POI.MountainPeak.Icon.Size": 0,
+    "POI.TransitStop.Label.Color": "#0037a4",
+    "POI.TransitStop.Icon.Size": ["interpolate", ["linear"], ["zoom"], 14, 0, 14, 30, 18, 34, 20, 38, 24, 72],
+    "POI.TransitAccess.Icon.Size": ["interpolate", ["linear"], ["zoom"], 18, 31.9, 19, 31.9, 20, 31.9, 24, 72.5]
   }
 }

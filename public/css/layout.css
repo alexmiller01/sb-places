@@ -39,3 +39,30 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 767px) {
+  .places-main {
+    grid-template-columns: 1fr;
+    gap: var(--uds-space-lg);
+  }
+
+  .places-sidebar {
+    gap: var(--uds-space-lg);
+    order: -1;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  .places-sidebar::after {
+    content: '';
+    display: block;
+    width: 100vw;
+    height: 6px;
+    background: var(--uds-background-secondary);
+    margin-left: calc(-1 * var(--uds-space-md));
+  }
+
+  .places-main-left {
+    order: 1;
+  }
+}

@@ -195,7 +195,7 @@
     var mapWrap = document.querySelector('.supertop-map');
     var mapInner = mapWrap ? mapWrap.querySelector('.supertop-map-inner') : null;
     var bricks = document.querySelector('.supertop-bricks');
-    var mapExpandIcon = mapExpandBtn ? mapExpandBtn.querySelector('img') : null;
+    var mapExpandLabel = mapExpandBtn ? mapExpandBtn.querySelector('.supertop-map-expand-label') : null;
     var mapTransitioning = false;
     var resizeRaf = null;
 
@@ -239,7 +239,7 @@
           bricks.classList.remove('is-map-expanded');
           mapExpandBtn.setAttribute('aria-expanded', 'false');
           mapExpandBtn.setAttribute('aria-label', 'Expand map');
-          if (mapExpandIcon) mapExpandIcon.src = '/assets/expand.svg';
+          if (mapExpandLabel) mapExpandLabel.textContent = 'Explore';
 
           var onCollapseDone = function (ev) {
             if (ev.propertyName !== 'height') return;
@@ -256,7 +256,7 @@
           bricks.classList.add('is-map-expanded');
           mapExpandBtn.setAttribute('aria-expanded', 'true');
           mapExpandBtn.setAttribute('aria-label', 'Collapse map');
-          if (mapExpandIcon) mapExpandIcon.src = '/assets/collapse.svg';
+          if (mapExpandLabel) mapExpandLabel.textContent = 'Collapse';
 
           var onExpandDone = function (ev) {
             if (ev.propertyName !== 'height') return;

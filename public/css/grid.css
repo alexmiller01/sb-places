@@ -3,6 +3,7 @@
  */
 body {
   margin: 0;
+  overflow-x: hidden;
 }
 
 .grid {
@@ -11,4 +12,11 @@ body {
   margin-right: auto;
   padding-left: var(--uds-space-lg);
   padding-right: var(--uds-space-lg);
+}
+
+@media (max-width: 767px) {
+  .grid {
+    padding-left: var(--uds-space-md);
+    padding-right: var(--uds-space-md);
+  }
 }

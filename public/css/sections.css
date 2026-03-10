@@ -342,3 +342,82 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Mobile responsive ── */
+@media (max-width: 767px) {
+  /* Overview */
+  .places-overview-title {
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  .places-about-text {
+    font-size: 14px;
+    line-height: 21px;
+  }
+
+  /* Quick facts */
+  .quick-facts-title {
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  .quick-facts-row {
+    flex-direction: column;
+    gap: var(--uds-space-2xs);
+    align-items: flex-start;
+  }
+
+  .quick-facts-label {
+    font-size: 14px;
+  }
+
+  .quick-facts-value {
+    font-size: 14px;
+  }
+
+  /* More flights */
+  .more-flights-title {
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  .more-flights-details {
+    min-width: 120px;
+    gap: var(--uds-space-lg);
+  }
+
+  .more-flights-name {
+    font-size: 14px;
+  }
+
+  .more-flights-btn {
+    font-size: 13px;
+  }
+
+  /* Related searches */
+  .related-searches-title {
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  .related-searches-row {
+    flex-wrap: wrap;
+    gap: var(--uds-space-sm);
+  }
+
+  .related-tile-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .related-tile-label {
+    width: 80px;
+    font-size: 12px;
+  }
+
+  /* Videos grid */
+  .places-videos-grid {
+    grid-template-columns: 1fr;
+  }
+}
