@@ -439,6 +439,9 @@
 
   .more-flights-btn {
     font-size: 13px;
+    width: 100%;
+    justify-content: center;
+    align-self: stretch;
   }
 
   /* Related searches */
