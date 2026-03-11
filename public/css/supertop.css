@@ -1569,6 +1569,15 @@
     min-height: 120px;
   }
 
+  .supertop-weather-row {
+    justify-content: flex-start;
+    margin-left: -20px;
+  }
+
+  .supertop-weather-day:nth-child(3) {
+    display: none;
+  }
+
   .supertop-map-expand {
     padding: var(--uds-space-xs) var(--uds-space-sm);
   }
