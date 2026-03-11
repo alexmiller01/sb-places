@@ -220,6 +220,10 @@
         if (mapMouseMoved) return;
         if (e.target.closest('.supertop-map-expand')) return;
         if (e.target.closest('.supertop-map-ctrl')) return;
+        if (window.innerWidth < 768 && typeof openMobileMapOverlay === 'function') {
+          openMobileMapOverlay();
+          return;
+        }
         if (mapExpandBtn) mapExpandBtn.click();
       });
     }
@@ -227,6 +231,10 @@
     if (mapExpandBtn && mapWrap && bricks) {
       mapExpandBtn.addEventListener('click', function (e) {
         e.preventDefault();
+        if (window.innerWidth < 768 && typeof openMobileMapOverlay === 'function') {
+          openMobileMapOverlay();
+          return;
+        }
         if (mapTransitioning) return;
         mapTransitioning = true;
         resizeRaf = requestAnimationFrame(continuousResize);

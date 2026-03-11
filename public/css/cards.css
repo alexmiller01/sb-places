@@ -359,14 +359,14 @@
 .ttd-card-yelp-text {
   font-family: var(--uds-font-sans);
   font-size: var(--uds-text-body2-size);
-  font-weight: var(--uds-text-ui2-weight);
+  font-weight: var(--uds-text-body2-weight);
   line-height: 20px;
   color: var(--uds-foreground-secondary);
   margin-left: 2px;
 }
 
 .ttd-card-yelp-text strong {
-  font-weight: 700;
+  font-weight: var(--uds-text-ui2-weight);
 }
 
 .ttd-more-btn {
@@ -445,12 +445,12 @@
 }
 
 .ttd-carousel-btn.next {
-  right: -8px;
+  right: -20px;
   transform: translateY(-50%);
 }
 
 .ttd-carousel-btn.prev {
-  left: -8px;
+  left: -20px;
   transform: translateY(-50%);
   display: none;
 }
@@ -506,13 +506,13 @@
 .ttd-card-rating-text {
   font-family: var(--uds-font-sans);
   font-size: var(--uds-text-body2-size);
-  font-weight: var(--uds-text-ui2-weight);
+  font-weight: var(--uds-text-body2-weight);
   line-height: 20px;
   color: var(--uds-foreground-secondary);
 }
 
 .ttd-card-rating-text strong {
-  font-weight: 700;
+  font-weight: var(--uds-text-ui2-weight);
 }
 
 .ttd-card-name {
@@ -637,11 +637,11 @@
   }
 
   .ttd-carousel-btn.next {
-    right: var(--uds-space-xs);
+    right: -18px;
   }
 
   .ttd-carousel-btn.prev {
-    left: var(--uds-space-xs);
+    left: -18px;
   }
 
   /* Card adjustments */
@@ -650,8 +650,9 @@
   }
 
   .ttd-card-name {
-    font-size: 14px;
-    line-height: 20px;
+    font-size: 16px;
+    font-weight: var(--uds-text-ui2-weight);
+    line-height: 24px;
   }
 
   .ttd-card-price {
