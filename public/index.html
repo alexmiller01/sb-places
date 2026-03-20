@@ -217,6 +217,15 @@
       </div>
     </div>
   </header>
+  <script>
+    (function() {
+      var nav = document.querySelector('.nav-header');
+      if (nav) document.documentElement.style.setProperty('--nav-height', nav.offsetHeight + 'px');
+      window.addEventListener('resize', function() {
+        if (nav) document.documentElement.style.setProperty('--nav-height', nav.offsetHeight + 'px');
+      });
+    })();
+  </script>
   <main class="grid">
     <section class="supertop" aria-labelledby="location-title">
       <div class="supertop-header">

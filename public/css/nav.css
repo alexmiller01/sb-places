@@ -6,9 +6,12 @@
 .nav-header {
   background: var(--uds-background-primary);
   border-bottom: var(--uds-border-thin) solid var(--uds-line-secondary);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  width: 100%;
   z-index: 100;
+  box-sizing: border-box;
 }
 
 .nav-inner {
