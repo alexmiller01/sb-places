@@ -1713,15 +1713,16 @@
 
       overlay.classList.add('active');
       var mapWrap = document.querySelector('.supertop-map');
-      if (mapWrap && mapWrap.classList.contains('is-expanded')) {
-        mapWrap.style.width = 'calc(100% - 446px - 24px + 268px)';
-        mapWrap.style.maxWidth = 'calc(1146px - 446px - 24px + 268px)';
-        setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 50);
-        var rafResize = requestAnimationFrame(function tick() {
-          window.dispatchEvent(new Event('resize'));
-          if (overlay.classList.contains('active')) requestAnimationFrame(tick);
-        });
-        setTimeout(function() { cancelAnimationFrame(rafResize); }, 350);
+      if (mapWrap) {
+        mapWrap.classList.add('biz-overlay-open');
+        if (mapWrap.classList.contains('is-expanded')) {
+          setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 50);
+          var rafResize = requestAnimationFrame(function tick() {
+            window.dispatchEvent(new Event('resize'));
+            if (overlay.classList.contains('active')) requestAnimationFrame(tick);
+          });
+          setTimeout(function() { cancelAnimationFrame(rafResize); }, 350);
+        }
       }
     }
 
@@ -1731,8 +1732,7 @@
       overlay.classList.remove('active');
       var mapWrap = document.querySelector('.supertop-map');
       if (mapWrap) {
-        mapWrap.style.width = '';
-        mapWrap.style.maxWidth = '';
+        mapWrap.classList.remove('biz-overlay-open');
         var startTime = Date.now();
         function resizeTick() {
           window.dispatchEvent(new Event('resize'));
