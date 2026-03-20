@@ -550,10 +550,6 @@
   left: var(--uds-space-sm);
   display: none;
   gap: var(--uds-space-xs);
-  padding: var(--uds-space-sm);
-  border-radius: var(--uds-radius-xl);
-  background: var(--uds-background-primary);
-  box-shadow: var(--uds-elevation-1-shadow);
   z-index: 10;
 }
 
@@ -573,6 +569,7 @@
   color: var(--uds-foreground-primary);
   cursor: pointer;
   white-space: nowrap;
+  box-shadow: var(--uds-elevation-1-shadow);
   transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
