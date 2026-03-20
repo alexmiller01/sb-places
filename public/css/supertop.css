@@ -543,6 +543,49 @@
   color: inherit;
 }
 
+/* Map filter chips – Figma 1375:31899 */
+.map-filters {
+  position: absolute;
+  top: var(--uds-space-sm);
+  left: var(--uds-space-sm);
+  display: none;
+  gap: var(--uds-space-xs);
+  padding: var(--uds-space-sm);
+  border-radius: var(--uds-radius-xl);
+  background: var(--uds-background-primary);
+  box-shadow: var(--uds-elevation-1-shadow);
+  z-index: 10;
+}
+
+.supertop-map.is-expanded .map-filters {
+  display: flex;
+}
+
+.map-filter-chip {
+  background: var(--uds-background-primary);
+  border: var(--uds-border-thin) solid var(--uds-line-primary);
+  border-radius: var(--uds-radius-full);
+  padding: 6px var(--uds-space-sm);
+  font-family: var(--uds-font-sans);
+  font-size: var(--uds-text-label4-size);
+  font-weight: var(--uds-text-label4-weight);
+  line-height: var(--uds-text-label4-line-height);
+  color: var(--uds-foreground-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.map-filter-chip:hover {
+  background: var(--uds-line-tertiary);
+}
+
+.map-filter-chip.active {
+  background: var(--uds-always-black);
+  color: var(--uds-always-white);
+  border-color: var(--uds-always-black);
+}
+
 /* Weather + flights cards – UDS elevation-1, radius-md */
 
 .supertop-card {

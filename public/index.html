@@ -252,6 +252,11 @@
         <div class="supertop-map">
           <div class="supertop-map-inner">
             <div id="supertop-here-map" class="supertop-map-container" aria-label="Map of Chicago"></div>
+            <div class="map-filters" id="mapFilters">
+              <button type="button" class="map-filter-chip" data-filter="things-to-do">Things to do</button>
+              <button type="button" class="map-filter-chip" data-filter="where-to-eat">Where to eat</button>
+              <button type="button" class="map-filter-chip" data-filter="places-to-stay">Places to stay</button>
+            </div>
             <button type="button" class="supertop-map-search-area" id="mapSearchArea">Search this area</button>
             <div class="supertop-map-controls">
               <button type="button" class="supertop-map-ctrl" id="mapZoomIn" aria-label="Zoom in">
@@ -1354,6 +1359,59 @@
         poiMarkers.forEach(function(m) { map.removeObject(m); });
         poiMarkers.length = 0;
       }
+
+      var filterCategoryMap = {
+        'things-to-do': ['theater', 'museum', 'park'],
+        'where-to-eat': ['restaurant', 'bakery', 'coffee'],
+        'places-to-stay': ['hotel']
+      };
+      var activeFilter = null;
+
+      function applyMapFilter(filterName) {
+        if (activeFilter === filterName) {
+          activeFilter = null;
+        } else {
+          activeFilter = filterName;
+        }
+        document.querySelectorAll('.map-filter-chip').forEach(function(chip) {
+          chip.classList.toggle('active', chip.getAttribute('data-filter') === activeFilter);
+        });
+        removePOIMarkers();
+        poiMarkers.length = 0;
+        var filteredPOIs = activeFilter
+          ? chicagoPOIs.filter(function(poi) { return filterCategoryMap[activeFilter].indexOf(poi.category) !== -1; })
+          : chicagoPOIs;
+        filteredPOIs.forEach(function(poi) {
+          var icon = categoryIcons[poi.category] || defaultIcon;
+          var marker = new H.map.Marker({ lat: poi.lat, lng: poi.lng }, { icon: icon, data: poi });
+          marker.addEventListener('pointerenter', function() {
+            cancelHide();
+            if (activeMarker && activeMarker !== marker) {
+              var prevPoi = activeMarker.getData();
+              activeMarker.setIcon(categoryIcons[prevPoi.category] || defaultIcon);
+            }
+            activeMarker = marker;
+            marker.setIcon(categoryFocusIcons[poi.category] || categoryFocusIcons['coffee']);
+            var pos = map.geoToScreen(marker.getGeometry());
+            if (pos) showHoverCard(poi, pos.x, pos.y);
+          });
+          marker.addEventListener('pointerleave', function() {
+            scheduleHide();
+          });
+          marker.addEventListener('tap', function() {
+            hideHoverCard();
+            if (typeof openBusinessOverlay === 'function') openBusinessOverlay(poi);
+          });
+          map.addObject(marker);
+          poiMarkers.push(marker);
+        });
+      }
+
+      document.querySelectorAll('.map-filter-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+          applyMapFilter(chip.getAttribute('data-filter'));
+        });
+      });
 
       window.addEventListener('supertop-map-expanded', function(e) {
         if (e.detail && e.detail.expanded) {
