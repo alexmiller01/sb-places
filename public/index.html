@@ -1405,6 +1405,20 @@
           map.addObject(marker);
           poiMarkers.push(marker);
         });
+        if (filteredPOIs.length) {
+          var lats = filteredPOIs.map(function(p) { return p.lat; });
+          var lngs = filteredPOIs.map(function(p) { return p.lng; });
+          var centerLat = (Math.max.apply(null, lats) + Math.min.apply(null, lats)) / 2;
+          var centerLng = (Math.max.apply(null, lngs) + Math.min.apply(null, lngs)) / 2;
+          var bbox = new H.geo.Rect(
+            Math.max.apply(null, lats), Math.min.apply(null, lngs),
+            Math.min.apply(null, lats), Math.max.apply(null, lngs)
+          );
+          map.getViewModel().setLookAtData({
+            bounds: bbox,
+            zoom: Math.min(map.getViewModel().getLookAtData().zoom || 14, 14)
+          }, true);
+        }
       }
 
       document.querySelectorAll('.map-filter-chip').forEach(function(chip) {
